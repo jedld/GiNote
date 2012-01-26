@@ -1,0 +1,66 @@
+package com.dayosoft.utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.provider.MediaStore;
+import android.widget.ImageView;
+
+public class ImageDownloadTask extends AsyncTask<Void, Void, Void> {
+	private final WeakReference<ImageView> imageref;
+	Drawable image;
+	String url;
+	Context context;
+
+	public ImageDownloadTask(Context context, ImageView imageView, String url) {
+		super();
+		this.imageref = new WeakReference<ImageView>(imageView);
+		this.url = url;
+		this.context = context;
+	}
+
+	@Override
+	protected Void doInBackground(Void... arg0) {
+		// TODO Auto-generated method stub
+		image = imageOperations(context, this.url, "image.jpg");
+		return null;
+	}
+
+	private Drawable imageOperations(Context ctx, String url,
+			String saveFilename) {
+			Drawable d = Drawable.createFromPath(url);
+			
+			return d;
+		
+	}
+
+	public Object fetch(String address) throws MalformedURLException,
+			IOException {
+		URL url = new URL(address);
+		Object content = url.getContent();
+		return content;
+	}
+
+	@Override
+	protected void onPostExecute(Void v) {
+		if (imageref != null && image != null) {
+			ImageView imageView = imageref.get();
+			if (imageView != null) {
+				
+				imageView.setImageDrawable(image);
+			}
+		}
+	}
+
+}

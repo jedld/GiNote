@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+<item android:title="About" android:titleCondensed="About" android:id="@+id/about" android:icon="@drawable/info"></item>
+<item android:id="@+id/itemExport" android:title="Export to SD" android:icon="@drawable/export"></item>
+<item android:id="@+id/itemOptions" android:title="Options" android:icon="@drawable/options"></item>
+<item android:title="Quit" android:id="@+id/itemquit" android:titleCondensed="Quit"></item>
+
+<item android:id="@+id/item01" android:title="Import/Export" android:titleCondensed="Import/Export"></item>
+</menu>

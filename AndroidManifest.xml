@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.dayosoft.quicknotes" android:versionName="3.00"
+	android:versionCode="37" android:installLocation="auto">
+	<application android:icon="@drawable/copy" android:label="@string/app_name"
+	    android:theme="@style/android:Theme.Holo"
+		android:backupAgent=".GiNoteBackupAgent">
+
+		<activity android:name=".ListNotes" android:label="@string/app_name"
+		    android:theme="@style/android:Theme.Holo.NoActionBar" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<action android:name="android.intent.action.SEARCH" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<meta-data android:name="android.app.searchable"
+				android:resource="@xml/searchable" />
+		</activity>
+
+		<activity android:name=".Options" />
+		<activity android:name=".Picture" />
+		<activity android:name=".ViewNotes" />
+		<activity android:name=".AddNotes"
+			android:windowSoftInputMode="stateVisible" 
+			 />
+
+		<meta-data android:name="com.google.android.backup.api_key"
+			android:value="AEdPqrEAAAAI0gjZ9oHySSA1uAkXti5DYb4rT5dXtcQWq2YDZQ" />
+
+		<!-- The application's publisher ID assigned by AdMob -->
+		<meta-data android:value="a14ccb8a550b755" android:name="ADMOB_PUBLISHER_ID" />
+
+		<!-- AdMobActivity definition -->
+		<activity android:name="com.admob.android.ads.AdMobActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:configChanges="orientation|keyboard|keyboardHidden" />
+
+		<!-- Track Market installs -->
+		<receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="com.android.vending.INSTALL_REFERRER" />
+			</intent-filter>
+		</receiver>
+
+	</application>
+	<supports-screens android:largeScreens="true"
+		android:normalScreens="true" android:smallScreens="true"
+		android:anyDensity="true" />
+	<uses-sdk android:minSdkVersion="14" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.INTERNET" />
+</manifest> 

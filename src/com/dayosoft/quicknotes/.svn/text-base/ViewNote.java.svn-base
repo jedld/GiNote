@@ -1,0 +1,97 @@
+package com.dayosoft.quicknotes;
+
+import java.text.SimpleDateFormat;
+
+import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.DictionaryOpenHelper;
+
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.PorterDuff.Mode;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class ViewNote extends Activity {
+	EditText titleField, contentField;
+	DictionaryOpenHelper helper;
+	int currentNoteId;
+
+	OnClickListener deleteNoteListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			DialogUtils.showConfirmation("Are you sure you want to delete?",
+					ViewNote.this,
+					new android.content.DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							helper.delete(currentNoteId);
+							ViewNote.this.finish();
+						}
+
+					}
+
+			);
+
+		}
+
+	};
+
+	OnClickListener saveNoteListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Note note = new Note();
+			note.setId(currentNoteId);
+			note.setTitle(titleField.getText().toString());
+			note.setContent(contentField.getText().toString());
+			helper.update(note);
+			ViewNote.this.finish();
+		}
+
+	};
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		setContentView(R.layout.viewnote);
+		titleField = (EditText) findViewById(R.id.NoteTitle);
+		contentField = (EditText) findViewById(R.id.ContentField);
+		TextView timelabel = (TextView) findViewById(R.id.time);
+		Button deleteNoteButton = (Button) findViewById(R.id.DeleteNote);
+		deleteNoteButton.setOnClickListener(deleteNoteListener);
+		Button saveNoteButton = (Button) findViewById(R.id.UpdateNote);
+		saveNoteButton.setOnClickListener(saveNoteListener);
+		
+		Button cancelButton = (Button) findViewById(R.id.cancel);
+		cancelButton.setOnClickListener(DialogUtils.closeNavigator(this));
+				
+		//deleteNoteButton.getBackground().setColorFilter(0xFFFF0000, Mode.MULTIPLY);
+		//saveNoteButton.getBackground().setColorFilter(0xFF00FF00, Mode.MULTIPLY);
+		helper = new DictionaryOpenHelper(this);
+		Intent intent = getIntent();
+		int row_id = intent.getIntExtra("view_id", 0);
+
+		currentNoteId = row_id;
+		if (row_id != 0) {
+			Note note = helper.load(row_id);
+			titleField.setText(note.getTitle());
+			contentField.setText(note.getContent());
+
+			SimpleDateFormat dateformat = new SimpleDateFormat(
+			"hh:mma MM-dd-yyyy");
+			
+			timelabel.setText(dateformat.format(note.getDate_created()));
+		}
+	}
+
+}

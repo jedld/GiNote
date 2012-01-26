@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res/com.dayosoft.quicknotes"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<Button android:text="Add Note" android:id="@+id/addButton"
+		android:drawableLeft="@drawable/add" android:textSize="20dip"
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
+	</Button>
+
+	<ScrollView
+	    android:id="@+id/list"
+	    android:layout_width="match_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="2"
+	    android:orientation="vertical" >
+
+		<TableLayout android:id="@+id/notesList"
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:stretchColumns="0"
+			android:padding="3dip">
+		</TableLayout>
+	</ScrollView>
+	<com.admob.android.ads.AdView android:id="@+id/ad" android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+		app:backgroundColor="#000000" app:primaryTextColor="#FFFFFF"
+		app:secondaryTextColor="#CCCCCC" app:keywords="ginote note taking" />
+</LinearLayout>

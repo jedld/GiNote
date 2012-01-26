@@ -1,0 +1,258 @@
+package com.dayosoft.quicknotes;
+
+import java.util.List;
+import com.admob.android.ads.AdManager;
+import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.DictionaryOpenHelper;
+import com.dayosoft.utils.ImageDownloadTask;
+import com.dayosoft.utils.TimeUtils;
+
+import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+
+public class ListNotes extends Activity {
+	TableLayout notesview;
+	DictionaryOpenHelper helper;
+
+	OnClickListener imageClickedLister = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			ImageView image = (ImageView) v;
+			Intent intent = new Intent(ListNotes.this, Picture.class);
+			intent.putExtra("image_uri", image.getContentDescription());
+			ListNotes.this.startActivity(intent);
+		}
+
+	};
+
+	OnClickListener closeImagePanelClickedListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			LinearLayout layout = (LinearLayout)v;
+			int note_id = v.getId();
+			Note note = helper.load(note_id);			
+			layout.removeAllViews();
+			TextView viewImagePanel = new TextView(ListNotes.this);
+			viewImagePanel.setTextColor(Color.BLACK);
+			viewImagePanel.setBackgroundColor(Color.LTGRAY);
+			List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
+			viewImagePanel.setLayoutParams(new LayoutParams(
+					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));			
+			viewImagePanel.setText(imagelist.size()
+					+ " image(s) Tap here to view");
+			viewImagePanel.setTextSize(18);			
+			layout.setOnClickListener(showImagePnaelClickedListener);
+			layout.addView(viewImagePanel);
+			System.gc();
+		}
+		
+	};
+	
+	OnClickListener showImagePnaelClickedListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			int note_id = v.getId();
+			LinearLayout layout = (LinearLayout)v;
+			layout.removeAllViews();
+			layout.setOnClickListener(closeImagePanelClickedListener);
+			Note note = helper.load(note_id);
+			List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
+			int count = 0;
+			System.gc();			
+			for (NoteMeta imagemeta : imagelist) {
+				ImageView image = new ImageView(ListNotes.this);
+
+				image.setOnClickListener(imageClickedLister);
+				image.setMaxWidth(90);
+				image.setMaxHeight(90);
+				image.setPadding(5, 0, 0, 0);
+				image.setAdjustViewBounds(true);
+				image.setId(note.getId());
+				String uri = imagemeta.getResource_url();
+				image.setContentDescription(uri);
+				Log.d(this.getClass().toString(), "uri=" + uri);
+				ImageDownloadTask imagetask = new ImageDownloadTask(
+						ListNotes.this, image, uri);
+				imagetask.execute();
+				layout.addView(image);
+				if (++count >= 5)
+					break;
+			}
+		}
+
+	};
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		notesview.removeAllViews();
+
+		Intent intent = getIntent();
+		List<Note> list;
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			list = helper.listNotes(query);
+		} else {
+			list = helper.listNotes();
+		}
+		OnClickListener navigator = DialogUtils.setNavigator(ViewNote.class,
+				this);
+		for (Note note : list) {
+			TableRow row = new TableRow(this);
+
+			TableLayout mainpanel = new TableLayout(this);
+
+			TableRow mainpanelrow = new TableRow(this);
+			TableRow daterow = new TableRow(this);
+			TextView text = new TextView(this);
+
+			text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
+			text.setPadding(0, 5, 0, 5);
+			if (note.getTitle().length() > 20) {
+				note.setTitle(note.getTitle().substring(0, 20));
+			}
+			text.setText(note.title);
+			TextView datetime = new TextView(this);
+			datetime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+
+			datetime.setText(TimeUtils.computeRelativeTimeString(note
+					.getDate_created()));
+
+			TextView locationUrl = null;
+			List<NoteMeta> metalist = note.getMeta(NoteMeta.GOOGLEMAPSURL);
+			if (metalist.size() > 0) {
+				locationUrl = new TextView(this);
+				locationUrl.setMovementMethod(LinkMovementMethod.getInstance());
+				locationUrl.setAutoLinkMask(Linkify.WEB_URLS);
+				locationUrl.setLinksClickable(true);
+				String locationstr = metalist.get(0).getResource_url();
+				locationUrl.setText(locationstr);
+			}
+
+			List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
+			TextView imageCountText = new TextView(this);
+			imageCountText.setGravity(Gravity.RIGHT);
+			TableRow imagerow = null;
+			if (imagelist.size() > 0) {
+				imagerow = new TableRow(this);
+
+				int count = 0;
+				LinearLayout layout = new LinearLayout(this);
+				layout.setOrientation(LinearLayout.HORIZONTAL);
+				TextView viewImagePanel = new TextView(this);
+				viewImagePanel.setTextColor(Color.BLACK);
+				viewImagePanel.setBackgroundColor(Color.LTGRAY);
+				viewImagePanel.setText(imagelist.size()
+						+ " image(s) Tap here to view");
+				viewImagePanel.setLayoutParams(new LayoutParams(
+						LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				viewImagePanel.setTextSize(18);
+				layout.addView(viewImagePanel);
+				layout.setId(note.getId());
+				layout.setOnClickListener(showImagePnaelClickedListener);
+				imagerow.addView(layout);
+			}
+
+			mainpanel.setId(note.getId());
+			mainpanelrow.addView(text);
+
+			daterow.addView(datetime);
+			daterow.addView(new FrameLayout(this));
+
+			mainpanel.setOnClickListener(navigator);
+			mainpanel.addView(mainpanelrow);
+
+			mainpanel.addView(daterow);
+
+			row.addView(mainpanel);
+			notesview.addView(row);
+			if (imagerow != null)
+				notesview.addView(imagerow);
+			View separator = new View(this);
+			separator.setBackgroundColor(0xFF909090);
+			separator.setLayoutParams(new LayoutParams(
+					LayoutParams.FILL_PARENT, 3));
+			if (locationUrl != null) {
+				notesview.addView(locationUrl);
+			}
+			notesview.addView(separator);
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mainmenu, menu);
+		return true;
+	}
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		setContentView(R.layout.main);
+		notesview = (TableLayout) findViewById(R.id.notesList);
+		Button addNoteButton = (Button) findViewById(R.id.addButton);
+
+		// setup simple button navigation
+		addNoteButton.setOnClickListener(DialogUtils.setNavigator(
+				AddNotes.class, this));
+		helper = new DictionaryOpenHelper(this);
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.about:
+			DialogUtils
+					.showMessageAlert(
+							"GiNote 1.4\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
+							this);
+			return true;
+		case R.id.itemquit:
+			this.finish();
+			return true;
+		case R.id.itemExport:
+			Export export = new Export(this);
+			export.execute();
+			break;
+		case R.id.itemOptions:
+			DialogUtils.switchActivity(Options.class, this);
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		return true;
+	}
+}

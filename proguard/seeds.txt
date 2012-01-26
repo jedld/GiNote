@@ -1,0 +1,6 @@
+com.dayosoft.quicknotes.ListNotes
+com.dayosoft.quicknotes.GiNoteBackupAgent
+com.dayosoft.quicknotes.Options
+com.dayosoft.quicknotes.Picture
+com.dayosoft.quicknotes.ViewNotes
+com.dayosoft.quicknotes.AddNotes
