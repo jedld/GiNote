@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 import com.dayosoft.quicknotes.Note;
@@ -18,7 +19,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static final String DATABASE_NAME = "QUICKNOTES";
 	private static final String DICTIONARY_TABLE_NAME = "notes";
 	private static final String DICTIONARY_TABLE_CREATE = "CREATE TABLE "
@@ -157,7 +158,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public Note load(int id) {
-		String columns[] = { "id", "title", "content", "date_created" };
+		String columns[] = { "id", "title", "content", "uid", "date_created" };
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor notelist = db.query("notes", columns, "id=" + id, null, null,
 				null, "date_created DESC LIMIT 100");
@@ -166,9 +167,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			note.setId(id);
 			note.setTitle(notelist.getString(1));
 			note.setContent(notelist.getString(2));
-
+			note.setUid(notelist.getString(3));
 			try {
-				note.setDate_created(dateformat.parse(notelist.getString(3)));
+				note.setDate_created(dateformat.parse(notelist.getString(4)));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -220,6 +221,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
 		if (newRecord) {
 			newValues.put("DATE_UPDATED", datestr);
+			newValues.put("UID", UUID.randomUUID().toString());
 		} else {
 			newValues.put("DATE_UPDATED", datestr);
 			db.delete("NOTE_META", "NOTE_ID=" + note.getId(), null);
@@ -269,6 +271,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				db.execSQL("CREATE TABLE NOTE_VERSION"
 						+ " ( LAST_MODIFIED DATE);");
 				db.execSQL("INSERT INTO NOTE_VERSION (LAST_MODIFIED) VALUES (date('now'));");
+				break;
+			case 4:
+				db.execSQL("ALTER TABLE NOTES ADD COLUMN UID TEXT");
 				break;
 			}
 		}

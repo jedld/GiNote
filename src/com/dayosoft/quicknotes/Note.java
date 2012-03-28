@@ -7,7 +7,15 @@ import java.util.Vector;
 
 public class Note implements Serializable{
 	int id;
-	String title, content;
+	String title, content, uid;
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
 	double longitude, latitude;
 	Vector<NoteMeta> meta = new Vector<NoteMeta>();
 

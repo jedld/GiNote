@@ -78,7 +78,7 @@ public class Export extends AsyncTask<Void, Void, Integer> {
 
 						String finalDateTime = dateformat.format(note.getDate_created());
 
-						String data[] = { Integer.toString(note.getId()),
+						String data[] = { note.getUid(),
 								finalDateTime, note.getTitle(),
 								note.getContent(),
 								Double.toString(note.getLongitude()),
