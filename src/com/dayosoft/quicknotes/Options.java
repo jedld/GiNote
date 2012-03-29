@@ -1,10 +1,13 @@
 package com.dayosoft.quicknotes;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.FusionTableService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
+
 
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -100,6 +103,8 @@ public class Options extends Activity implements OnClickListener {
 	}
 
 	void onAuthToken() {
+		FusionTableService service = new FusionTableService(getAuthToken());
+		service.query("SHOW TABLES", true, null);
 	}
 
 	void setAccountName(String accountName) {
@@ -115,6 +120,10 @@ public class Options extends Activity implements OnClickListener {
 		editor.commit();
 		credential.setAccessToken(authToken);
 		Log.d(this.getClass().toString(), "Auth Token = " + authToken);
+	}
+	
+	String getAuthToken() {
+		return settings.getString(PREF_AUTH_TOKEN, null);
 	}
 
 }
