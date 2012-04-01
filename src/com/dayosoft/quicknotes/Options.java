@@ -1,9 +1,11 @@
 package com.dayosoft.quicknotes;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.FTQueryCompleteListener;
 import com.dayosoft.utils.FusionTableService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
@@ -38,7 +40,7 @@ class ClientCredentials {
 	}
 }
 
-public class Options extends Activity implements OnClickListener {
+public class Options extends Activity implements OnClickListener, FTQueryCompleteListener {
 
 	EditText suffixField;
 	GoogleAccountManager accountManager;
@@ -104,7 +106,7 @@ public class Options extends Activity implements OnClickListener {
 
 	void onAuthToken() {
 		FusionTableService service = new FusionTableService(getAuthToken());
-		service.query("SHOW TABLES", true, null);
+		service.query("SHOW TABLES", true, this);
 	}
 
 	void setAccountName(String accountName) {
@@ -124,6 +126,12 @@ public class Options extends Activity implements OnClickListener {
 	
 	String getAuthToken() {
 		return settings.getString(PREF_AUTH_TOKEN, null);
+	}
+
+	@Override
+	public void onQueryComplete(ArrayList<HashMap<String, String>> result) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
