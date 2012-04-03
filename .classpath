@@ -3,8 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry exported="true" kind="lib" path="libs/admob-sdk-android.jar"/>
+	<classpathentry kind="lib" path="libs/admob-sdk-android.jar"/>
 	<classpathentry kind="lib" path="C:/Users/joseph/workspace/proguard.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/joseph/workspace/ormlite-android-4.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/joseph/workspace/ormlite-android-4.10.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

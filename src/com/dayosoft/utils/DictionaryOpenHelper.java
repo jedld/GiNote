@@ -19,7 +19,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 	private static final String DATABASE_NAME = "QUICKNOTES";
 	private static final String DICTIONARY_TABLE_NAME = "notes";
 	private static final String DICTIONARY_TABLE_CREATE = "CREATE TABLE "
@@ -274,6 +274,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				break;
 			case 4:
 				db.execSQL("ALTER TABLE NOTES ADD COLUMN UID TEXT");
+				break;
+			case 5:
+				db.execSQL("ALTER TABLE NOTES ADD COLUMN SYNC_TS INTEGER");
 				break;
 			}
 		}

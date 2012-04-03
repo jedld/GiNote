@@ -18,9 +18,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.google.api.client.http.HttpRequest;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -42,13 +47,25 @@ public class FusionTableService extends
 		this.auth_token = auth_token;
 	}
 
+	public void create(String queryStr, boolean enc,
+			FTQueryCompleteListener listener) {
+		this.other_params.put("sql", queryStr);
+		if (enc) {
+			this.other_params.put("encid", "true");
+		}
+		this.listener = listener;
+		this.service = "create";
+		this.execute();
+	}
+
 	public void query(String queryStr, boolean enc,
 			FTQueryCompleteListener listener) {
 		this.other_params.put("sql", queryStr);
 		if (enc) {
 			this.other_params.put("encid", "true");
 		}
-		;
+		this.listener = listener;
+		this.service = "query";
 		this.execute();
 	}
 
@@ -58,19 +75,26 @@ public class FusionTableService extends
 		URL google_ft_url = null;
 		try {
 			String params = URLUtils.urlParamsToString(other_params);
-			String url_str = "https://www.google.com/fusiontables/api/"
-					+ service + "?" + params;
+			String url_str = "https://www.google.com/fusiontables/api/query"
+					+ "?" + params;
 			Log.d(this.getClass().toString(), ">>" + url_str);
 			google_ft_url = new URL(url_str);
 			conn = (HttpURLConnection) google_ft_url.openConnection();
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpget = new HttpGet(url_str);
-			httpget.setHeader("Authorization", "GoogleLogin auth=" + auth_token);
+
+			HttpRequestBase request = null;
+			if (service.equalsIgnoreCase("create")) {
+				request = new HttpPost(url_str);
+			} else {
+				request = new HttpGet(url_str);
+			}
+
+			request.setHeader("Authorization", "GoogleLogin auth=" + auth_token);
 			ResponseHandler<String> responseHandler = new BasicResponseHandler();
-			String responseBody = httpclient.execute(httpget, responseHandler);
+			String responseBody = httpclient.execute(request, responseHandler);
 			ArrayList<HashMap<String, String>> resultList = new ArrayList<HashMap<String, String>>();
 			CSVReader reader = new CSVReader(new StringReader(responseBody));
-			String [] columns = null;
+			String[] columns = null;
 			String[] nextLine;
 			boolean first_line = true;
 			while ((nextLine = reader.readNext()) != null) {
@@ -78,12 +102,12 @@ public class FusionTableService extends
 					columns = nextLine;
 					first_line = false;
 				} else {
-				HashMap<String,String> row = new HashMap<String,String>();
-				
-				for(int i=0; i < nextLine.length; i++) {
-					row.put(columns[i], nextLine[i]);
-				}
-				resultList.add(row);
+					HashMap<String, String> row = new HashMap<String, String>();
+
+					for (int i = 0; i < nextLine.length; i++) {
+						row.put(columns[i], nextLine[i]);
+					}
+					resultList.add(row);
 				}
 			}
 
@@ -102,10 +126,11 @@ public class FusionTableService extends
 	}
 
 	@Override
-	protected void onPostExecute(ArrayList<HashMap<String,String>> result) {
+	protected void onPostExecute(ArrayList<HashMap<String, String>> result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		if (listener != null) {
+			Log.d(this.getClass().toString(), "Calling on query");
 			listener.onQueryComplete(result);
 		}
 	}
