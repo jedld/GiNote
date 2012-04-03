@@ -47,6 +47,17 @@ public class FusionTableService extends
 		this.auth_token = auth_token;
 	}
 
+	public void create_sync(String queryStr, boolean enc,
+			FTQueryCompleteListener listener) {
+		this.other_params.put("sql", queryStr);
+		if (enc) {
+			this.other_params.put("encid", "true");
+		}
+		this.listener = listener;
+		this.service = "create";
+		onPostExecute(doInBackground());
+	}
+
 	public void create(String queryStr, boolean enc,
 			FTQueryCompleteListener listener) {
 		this.other_params.put("sql", queryStr);
@@ -56,6 +67,17 @@ public class FusionTableService extends
 		this.listener = listener;
 		this.service = "create";
 		this.execute();
+	}
+
+	public ArrayList<HashMap<String, String>> query_sync(String queryStr,
+			boolean enc, FTQueryCompleteListener listener) {
+		this.other_params.put("sql", queryStr);
+		if (enc) {
+			this.other_params.put("encid", "true");
+		}
+		this.listener = listener;
+		this.service = "query";
+		return doInBackground();
 	}
 
 	public void query(String queryStr, boolean enc,

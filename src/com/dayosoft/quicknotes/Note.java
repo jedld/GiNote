@@ -8,6 +8,15 @@ import java.util.Vector;
 public class Note implements Serializable{
 	int id;
 	String title, content, uid;
+	long sync_ts;
+	public long getSync_ts() {
+		return sync_ts;
+	}
+
+	public void setSync_ts(long sync_ts) {
+		this.sync_ts = sync_ts;
+	}
+
 	public String getUid() {
 		return uid;
 	}

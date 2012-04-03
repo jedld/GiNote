@@ -49,7 +49,7 @@ public class Options extends Activity implements OnClickListener,
 	GoogleAccountManager accountManager;
 	SharedPreferences settings;
 	private static final String TAG = "Ginote";
-	String[] items = {};
+	String[] items = {}, table_ids = {};
 	GoogleCredential credential = new GoogleCredential();
 	static final String PREF_ACCOUNT_NAME = "accountName";
 
@@ -160,7 +160,10 @@ public class Options extends Activity implements OnClickListener,
 									ArrayList<HashMap<String, String>> result) {
 								Toast.makeText(Options.this, "Table Created.",
 										Toast.LENGTH_SHORT).show();
+								String table_id = result.get(0).get("tableid");
+								Log.d(this.getClass().toString(), "storing table " + table_id);
 								setTableName(value);
+								setTableId(table_id);
 							}
 						});
 			}
@@ -180,11 +183,16 @@ public class Options extends Activity implements OnClickListener,
 	public void onQueryComplete(ArrayList<HashMap<String, String>> result) {
 
 		ArrayList<String> tablenames = new ArrayList<String>();
+		ArrayList<String> tableids = new ArrayList<String>();
+		
 		tablenames.add("Create New Table");
+		tableids.add("");
 		for (HashMap<String, String> map : result) {
 			tablenames.add(map.get("name"));
+			tableids.add(map.get("table id"));
 		}
-
+		
+		table_ids =  tableids.toArray(table_ids);
 		items = tablenames.toArray(items);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -197,18 +205,27 @@ public class Options extends Activity implements OnClickListener,
 					promptTableName();
 				} else {
 					setTableName(items[item]);
+					setTableId(table_ids[item]);
 				}
 			}
 		});
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+	
+	private void setTableId(String table_id) {
+		Log.d(this.getClass().toString(), "table id = " + table_id);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("sync_table_id", table_id);
+		editor.commit();
+	}
+	
 
 	private void setTableName(String name) {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("sync_table", name);
 		editor.commit();
-		tableNameField.setTag(name);
+		tableNameField.setText(name);
 	}
 	
 	private String getTableName() {
