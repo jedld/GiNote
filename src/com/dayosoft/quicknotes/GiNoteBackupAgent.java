@@ -86,7 +86,7 @@ public class GiNoteBackupAgent extends BackupAgent {
 				int len = buffer.length;
 				data.writeEntityHeader("note_data", len);
 				data.writeEntityData(buffer, len);
-				
+
 				FileOutputStream outstream = new FileOutputStream(
 						newState.getFileDescriptor());
 				DataOutputStream out = new DataOutputStream(outstream);
@@ -131,18 +131,21 @@ public class GiNoteBackupAgent extends BackupAgent {
 						JSONArray jsonarray = new JSONArray();
 						if (notes.has("notes")) {
 							if (notes.get("notes") instanceof JSONObject) {
-								Log.d(this.getClass().toString(), "JSONObject detected.");
+								Log.d(this.getClass().toString(),
+										"JSONObject detected.");
 								jsonarray.put(notes.get("notes"));
 							} else if (notes.get("notes") instanceof JSONArray) {
 								jsonarray = notes.getJSONArray("notes");
-								Log.d(this.getClass().toString(), "JSONArray detected.");
+								Log.d(this.getClass().toString(),
+										"JSONArray detected.");
 							}
 						}
 
 						for (int i2 = 0; i2 < jsonarray.length(); i2++) {
 							JSONObject notejson = jsonarray.getJSONObject(i2);
 							Note note = new Note();
-							Log.d(this.getClass().toString(), "Processing " + notejson.getInt("id"));
+							Log.d(this.getClass().toString(), "Processing "
+									+ notejson.getInt("id"));
 							note.setId(notejson.getInt("id"));
 							note.setTitle(notejson.getString("title"));
 							note.setContent(notejson.getString("content"));

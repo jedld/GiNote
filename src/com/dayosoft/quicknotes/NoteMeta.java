@@ -7,7 +7,7 @@ public class NoteMeta implements Serializable {
 	public static final int GOOGLEMAPSURL = 1;
 	public static final int LOCATIONNAME = 2;
 	public static final int IMAGE = 3;
-	
+
 	int type;
 
 	public int getType() {
@@ -37,5 +37,5 @@ public class NoteMeta implements Serializable {
 	int id;
 	int note_id;
 	String resource_url;
-	
+
 }

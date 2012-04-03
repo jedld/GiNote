@@ -120,6 +120,8 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			note.setTitle(titleField.getText().toString());
 			note.setContent(contentField.getText().toString());
 			note.setDate_created(current_note.getDate_created());
+			note.setSync_ts(current_note.getSync_ts());
+			note.setUid(current_note.getUid());
 			if (latestloc != null) {
 				note.setLongitude(latestloc.getLongitude());
 				note.setLatitude(latestloc.getLatitude());
@@ -193,9 +195,9 @@ public class AddNotes extends Activity implements LocationFixedListener {
 		if (row_id != 0) {
 			currentNoteId = row_id;
 			Note note = helper.load(row_id);
-			
+
 			current_note = note;
-			
+
 			List<NoteMeta> metalist = note.getMeta(NoteMeta.GOOGLEMAPSURL);
 			if (metalist.size() > 0) {
 				urlField.setText(metalist.get(0).getResource_url());
@@ -221,16 +223,16 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			timelabel.setText(dateformat.format(note.getDate_created()));
 		}
 		if (currentNoteId == 0) {
-			contentField.requestFocus();			
-		} 
+			contentField.requestFocus();
+		}
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.noteoptions, menu);
 		return true;
-	}	
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -257,13 +259,13 @@ public class AddNotes extends Activity implements LocationFixedListener {
 					Intent.ACTION_PICK,
 					android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 			startActivityForResult(i, ACTION_PICK_IMAGE);
-			break;			
+			break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
-	}	
-	
+	}
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -331,16 +333,14 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			// create new Intent
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-			intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,
-					imageUri);
+			intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
 			intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-			startActivityForResult(intent,
-					CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+			startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 		} else {
 			DialogUtils.showMessageAlert("SD Card is not mounted!", this);
 		}
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item

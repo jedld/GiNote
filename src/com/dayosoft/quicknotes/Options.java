@@ -72,7 +72,7 @@ public class Options extends Activity implements OnClickListener,
 		DialogUtils.linkBoxToPrefs(autoAddNote, settings, "auto_add_note");
 
 		Button setupGoogleAccount = (Button) findViewById(R.id.buttonFusionTableSync);
-		tableNameField = (EditText)findViewById(R.id.editTextTableName);
+		tableNameField = (EditText) findViewById(R.id.editTextTableName);
 		tableNameField.setText(getTableName());
 		setupGoogleAccount.setOnClickListener(this);
 		accountManager = new GoogleAccountManager(this);
@@ -161,7 +161,8 @@ public class Options extends Activity implements OnClickListener,
 								Toast.makeText(Options.this, "Table Created.",
 										Toast.LENGTH_SHORT).show();
 								String table_id = result.get(0).get("tableid");
-								Log.d(this.getClass().toString(), "storing table " + table_id);
+								Log.d(this.getClass().toString(),
+										"storing table " + table_id);
 								setTableName(value);
 								setTableId(table_id);
 							}
@@ -184,15 +185,15 @@ public class Options extends Activity implements OnClickListener,
 
 		ArrayList<String> tablenames = new ArrayList<String>();
 		ArrayList<String> tableids = new ArrayList<String>();
-		
+
 		tablenames.add("Create New Table");
 		tableids.add("");
 		for (HashMap<String, String> map : result) {
 			tablenames.add(map.get("name"));
 			tableids.add(map.get("table id"));
 		}
-		
-		table_ids =  tableids.toArray(table_ids);
+
+		table_ids = tableids.toArray(table_ids);
 		items = tablenames.toArray(items);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -212,14 +213,13 @@ public class Options extends Activity implements OnClickListener,
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
-	
+
 	private void setTableId(String table_id) {
 		Log.d(this.getClass().toString(), "table id = " + table_id);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("sync_table_id", table_id);
 		editor.commit();
 	}
-	
 
 	private void setTableName(String name) {
 		SharedPreferences.Editor editor = settings.edit();
@@ -227,7 +227,7 @@ public class Options extends Activity implements OnClickListener,
 		editor.commit();
 		tableNameField.setText(name);
 	}
-	
+
 	private String getTableName() {
 		return settings.getString("sync_table", "");
 	}

@@ -133,7 +133,7 @@ public class GoogleMapsLocation implements LocationListener {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return tinyurl;
 	}
 

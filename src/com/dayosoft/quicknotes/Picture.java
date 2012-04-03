@@ -21,7 +21,7 @@ public class Picture extends Activity {
 
 	Note note;
 	DictionaryOpenHelper helper;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -31,23 +31,24 @@ public class Picture extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		int note_id = Integer.parseInt(intent.getStringExtra("note_id"));
 		DisplayMetrics dm = new DisplayMetrics();
-	        getWindowManager().getDefaultDisplay().getMetrics(dm);
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-		Button backButton = (Button)findViewById(R.id.backButton);
-		LinearLayout layout = (LinearLayout)findViewById(R.id.images);
+		Button backButton = (Button) findViewById(R.id.backButton);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.images);
 		backButton.setOnClickListener(DialogUtils.closeNavigator(this));
-		
+
 		helper = new DictionaryOpenHelper(this);
 		note = helper.load(note_id);
-		int height =dm.heightPixels - backButton.getHeight() - 90;
-		
-		List <NoteMeta>imagelist = note.getMeta(NoteMeta.IMAGE);
-		
+		int height = dm.heightPixels - backButton.getHeight() - 90;
+
+		List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
+
 		int count = 0;
-		
+
 		for (NoteMeta imagemeta : imagelist) {
 			ImageView image = new ImageView(this);
-			image.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.FILL_PARENT));
+			image.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+					LayoutParams.FILL_PARENT));
 			image.setMaxWidth(dm.widthPixels);
 			image.setMaxHeight(height);
 			image.setPadding(10, 0, 0, 0);
@@ -57,13 +58,14 @@ public class Picture extends Activity {
 			String uri = imagemeta.getResource_url();
 			image.setContentDescription(uri);
 			Log.d(this.getClass().toString(), "uri=" + uri);
-			ImageDownloadTask imagetask = new ImageDownloadTask(this, image, uri, height, dm.widthPixels);
-			imagetask.execute((Void)null);
+			ImageDownloadTask imagetask = new ImageDownloadTask(this, image,
+					uri, height, dm.widthPixels);
+			imagetask.execute((Void) null);
 			layout.addView(image);
 			if (++count >= 5)
 				break;
-		}		
-		
+		}
+
 	}
-	
+
 }

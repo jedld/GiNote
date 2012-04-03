@@ -29,7 +29,6 @@ public final class TimeUtils {
 		return (datestr.equalsIgnoreCase(yesterday));
 	}
 
-	
 	public static String computeRelativeTimeString(Date value) {
 		SimpleDateFormat dateformat = new SimpleDateFormat("hh:mma MM-dd-yyyy");
 

@@ -2,6 +2,7 @@ package com.dayosoft.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
@@ -44,13 +46,13 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO) {
 			manager.dataChanged();
 		}
-		
+
 		if (DialogUtils.hasINet()) {
 			GoogleFTUpdater updater = new GoogleFTUpdater(context);
 			updater.execute();
 		}
 	}
-	
+
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		onUpgrade(db, 0, DATABASE_VERSION);
@@ -102,38 +104,78 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		return total;
 	}
 
+	public int count(String table, String whereClause) {
+		Cursor count_raw = getReadableDatabase().rawQuery(
+				"SELECT COUNT(*) AS COUNT FROM " + table + " WHERE "
+						+ whereClause, null);
+		count_raw.moveToFirst();
+		return count_raw.getInt(0);
+	}
+
 	public void listUnsyncedNotes(NoteSyncer sync) {
 
-		String columns[] = { "id", "title", "content",  "date_created", "uid" };
+		String columns[] = { "id", "title", "content", "date_created",
+				"date_updated", "uid", "sync_ts" };
 
-		String whereClause = "SYNC_TS = 0";
-		
-		Cursor notelist = getReadableDatabase().query("notes", columns,
-				whereClause, null, null, null, "date_created DESC LIMIT 1000");
-		if (notelist.moveToFirst()) {
-			// Iterate over each cursor.
-			do {
-				Note note = new Note();
-				note.setId(notelist.getInt(0));
-				note.setTitle(notelist.getString(1));
-				note.setContent(notelist.getString(2));
-				note.setUid(notelist.getString(4));
-				SimpleDateFormat dateformat = new SimpleDateFormat(
-						"yyyy-MM-dd HH:mm:ss");
-				try {
-					String datestr = notelist.getString(3);
-					note.setDate_created(dateformat.parse(datestr));
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		String whereClause = "SYNC_TS <= 0";
+		int total_records = count("NOTES", whereClause);
+		for (int offset = 0; offset <= total_records; offset += 500) {
+			Cursor notelist = getReadableDatabase().query("notes", columns,
+					whereClause, null, null, null,
+					"date_created DESC LIMIT " + offset + ",500");
+			if (notelist.moveToFirst()) {
+				// Iterate over each cursor.
+				Note new_notes_array[] = {}, updated_notes_array[] = {};
+				ArrayList<Note> new_notes = new ArrayList<Note>(), updated_notes = new ArrayList<Note>();
+				do {
+					Note note = new Note();
+					note.setId(notelist.getInt(0));
+					note.setTitle(notelist.getString(1));
+					note.setContent(notelist.getString(2));
+					note.setUid(notelist.getString(5));
+					Log.d(this.getClass().toString(),
+							"loading uid " + notelist.getString(5));
+					note.setSync_ts(notelist.getLong(6));
+					SimpleDateFormat dateformat = new SimpleDateFormat(
+							"yyyy-MM-dd HH:mm:ss");
+					try {
+						String datestr = notelist.getString(3);
+						note.setDate_created(dateformat.parse(datestr));
+						note.setDate_updated(dateformat.parse(notelist
+								.getString(4)));
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					getMeta(note);
+					if (note.getSync_ts() == 0) {
+						new_notes.add(note);
+					} else {
+						updated_notes.add(note);
+					}
+				} while (notelist.moveToNext());
+
+				new_notes_array = new_notes.toArray(new_notes_array);
+				updated_notes_array = updated_notes
+						.toArray(updated_notes_array);
+
+				if (new_notes_array.length > 0) {
+					Log.d(this.getClass().toString(), "syncing total = "
+							+ new_notes_array.length);
+					sync.process_new_records(new_notes_array);
 				}
-				getMeta(note);
-				sync.process(note);
-			} while (notelist.moveToNext());
+				if (updated_notes_array.length > 0) {
+					Log.d(this.getClass().toString(), "syncing total = "
+							+ updated_notes_array.length);
+					sync.process_updated_records(updated_notes_array);
+				}
+			}
+			notelist.close();
 		}
-		notelist.close();
+		;
+
 	}
-	
+
 	public List<Note> listNotes(String query) {
 		Vector<Note> returnList = new Vector<Note>();
 
@@ -199,7 +241,8 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public Note load(int id) {
-		String columns[] = { "id", "title", "content", "uid", "date_created", "sync_ts" };
+		String columns[] = { "id", "title", "content", "uid", "date_created",
+				"sync_ts" };
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor notelist = db.query("notes", columns, "id=" + id, null, null,
 				null, "date_created DESC LIMIT 100");
@@ -227,10 +270,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
 	public void touch(int id) {
 		SQLiteDatabase db = getWritableDatabase();
-		db.execSQL("UPDATE NOTES SET SYNC_TS=" + System.currentTimeMillis()+ " WHERE id=" + id);
+		db.execSQL("UPDATE NOTES SET SYNC_TS=" + System.currentTimeMillis()
+				+ " WHERE id=" + id);
 		db.close();
 	}
-	
+
 	public void persist(Note note) {
 		boolean newRecord = false;
 		long row_id = 0;
@@ -242,7 +286,6 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			newValues.put("ID", row_id);
 		}
 
-		
 		if (note.getTitle() == null || note.getTitle().trim().equals("")) {
 			String content = note.getContent();
 			if (content.length() > 30) {
@@ -260,9 +303,10 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				"yyyy-MM-dd HH:mm:ss");
 		if (note.getDate_created() == null)
 			note.setDate_created(new Date());
-		
-		newValues.put("DATE_CREATED", dateformat.format(note.getDate_created()));
-		
+
+		newValues
+				.put("DATE_CREATED", dateformat.format(note.getDate_created()));
+
 		String datestr = dateformat.format(note.getDate_created());
 
 		SQLiteDatabase db = getWritableDatabase();
@@ -271,12 +315,16 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			newValues.put("DATE_UPDATED", datestr);
 			newValues.put("UID", UUID.randomUUID().toString());
 		} else {
+			if (note.getSync_ts() > 0) {
+				newValues.put("SYNC_TS", -1);
+			}
 			newValues.put("DATE_UPDATED", datestr);
+			newValues.put("UID", note.getUid());
 			db.delete("NOTE_META", "NOTE_ID=" + note.getId(), null);
 		}
-		
+
 		row_id = db.replace("notes", null, newValues);
-		
+
 		for (NoteMeta meta : note.getMeta()) {
 			ContentValues metaNewValues = new ContentValues();
 			metaNewValues.put("NOTE_ID", row_id);

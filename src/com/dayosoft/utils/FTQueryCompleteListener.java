@@ -4,5 +4,5 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface FTQueryCompleteListener {
-	public void onQueryComplete(ArrayList<HashMap<String,String>> result);
+	public void onQueryComplete(ArrayList<HashMap<String, String>> result);
 }
