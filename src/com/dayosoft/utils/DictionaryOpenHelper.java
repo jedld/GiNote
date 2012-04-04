@@ -23,13 +23,13 @@ import android.util.Log;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_NAME = "QUICKNOTES";
 	private static final String DICTIONARY_TABLE_NAME = "notes";
 	private static final String DICTIONARY_TABLE_CREATE = "CREATE TABLE "
 			+ DICTIONARY_TABLE_NAME
 			+ " ( ID INTEGER PRIMARY KEY AUTOINCREMENT, TITLE TEXT, "
-			+ " CONTENT TEXT, DATE_CREATED DATE DEFAULT CURRENT_TIMESTAMP, DATE_UPDATED DATE);";
+			+ " CONTENT TEXT, DATE_CREATED DATE DEFAULT CURRENT_TIMESTAMP, DATE_UPDATED INTEGER);";
 	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	BackupManager manager;
 	Context context;
@@ -141,8 +141,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 					try {
 						String datestr = notelist.getString(3);
 						note.setDate_created(dateformat.parse(datestr));
-						note.setDate_updated(dateformat.parse(notelist
-								.getString(4)));
+						note.setDate_updated(notelist.getLong(4));
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -227,6 +226,19 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		metalist.close();
 	}
 
+	public int getLastFtSync() {
+		int date = 0;
+		SQLiteDatabase db = getReadableDatabase();
+		String columns[] = { "last_ft_sync" };
+		Cursor versionCursor = db.query("note_version", columns, null, null,
+				null, null, null);
+		if (versionCursor.moveToFirst()) {
+			date = versionCursor.getInt(0);
+		}
+		versionCursor.close();
+		return date;
+	}
+	
 	public String getLastModified() {
 		String date = "";
 		SQLiteDatabase db = getReadableDatabase();
@@ -240,9 +252,39 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		return date;
 	}
 
+	public Note load(String uid) {
+		String columns[] = { "id", "title", "content", "uid", "date_created", "date_updated",
+				"sync_ts" };
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor notelist = db.query("notes", columns, "uid='" + uid + "'", null, null,
+				null, "date_created DESC LIMIT 100");
+		if (notelist.moveToFirst()) {
+			Note note = new Note();
+			note.setId(note.getId());
+			note.setTitle(notelist.getString(1));
+			note.setContent(notelist.getString(2));
+			note.setUid(notelist.getString(3));
+			note.setDate_updated(notelist.getLong(5));
+			note.setSync_ts(notelist.getLong(6));
+			
+			try {
+				note.setDate_created(dateformat.parse(notelist.getString(4)));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			getMeta(note);
+			notelist.close();
+			return note;
+		}
+		notelist.close();
+		return null;
+	}
+	
 	public Note load(int id) {
 		String columns[] = { "id", "title", "content", "uid", "date_created",
-				"sync_ts" };
+				"date_updated", "sync_ts" };
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor notelist = db.query("notes", columns, "id=" + id, null, null,
 				null, "date_created DESC LIMIT 100");
@@ -252,7 +294,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			note.setTitle(notelist.getString(1));
 			note.setContent(notelist.getString(2));
 			note.setUid(notelist.getString(3));
-			note.setSync_ts(notelist.getLong(5));
+		
+			note.setDate_updated(notelist.getLong(5));
+			note.setSync_ts(notelist.getLong(6));
 			try {
 				note.setDate_created(dateformat.parse(notelist.getString(4)));
 			} catch (ParseException e) {
@@ -274,8 +318,14 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				+ " WHERE id=" + id);
 		db.close();
 	}
+	
+	public void touchLastFTSync() {
+		SQLiteDatabase db = getWritableDatabase();
+		db.execSQL("UPDATE NOTE_VERSION SET LAST_FT_SYNC = " + System.currentTimeMillis());
+		db.close();
+	}
 
-	public void persist(Note note) {
+	public long persist(Note note) {
 		boolean newRecord = false;
 		long row_id = 0;
 		ContentValues newValues = new ContentValues();
@@ -312,13 +362,14 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = getWritableDatabase();
 
 		if (newRecord) {
-			newValues.put("DATE_UPDATED", datestr);
-			newValues.put("UID", UUID.randomUUID().toString());
+			newValues.put("DATE_UPDATED", note.getDate_updated() == null ?  System.currentTimeMillis() : note.getDate_updated());
+			newValues.put("SYNC_TS", note.getSync_ts());
+			newValues.put("UID",  note.getUid()==null ? UUID.randomUUID().toString() : note.getUid());
 		} else {
 			if (note.getSync_ts() > 0) {
 				newValues.put("SYNC_TS", -1);
 			}
-			newValues.put("DATE_UPDATED", datestr);
+			newValues.put("DATE_UPDATED", System.currentTimeMillis());
 			newValues.put("UID", note.getUid());
 			db.delete("NOTE_META", "NOTE_ID=" + note.getId(), null);
 		}
@@ -335,6 +386,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		db.execSQL("UPDATE NOTE_VERSION SET LAST_MODIFIED=date('now')");
 		db.close();
 		onDataChanged();
+		return row_id;
 	}
 
 	public void delete(int id) {
@@ -373,6 +425,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				break;
 			case 5:
 				db.execSQL("ALTER TABLE NOTES ADD COLUMN SYNC_TS INTEGER DEFAULT 0");
+				break;
+			case 6:
+				db.execSQL("ALTER TABLE NOTE_VERSION ADD COLUMN LAST_FT_SYNC INTEGER DEFAULT 0");
 				break;
 			}
 		}

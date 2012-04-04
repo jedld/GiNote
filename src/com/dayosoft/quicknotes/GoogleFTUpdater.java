@@ -45,17 +45,17 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 		StringBuffer queryBuffer = new StringBuffer();
 		for (Note note : notes) {
 
-			Date date_updated = note.getDate_created();
+			long date_updated = note.getDate_updated();
 			if (note.getDate_updated() != null) {
 				date_updated = note.getDate_updated();
 			}
 			String queryStr = "INSERT INTO " + getTableId()
 					+ " (UID,TITLE,CONTENT,DATE_CREATED,DATE_UPDATED) VALUES "
-					+ "('" + note.getUid() + "', '"
-					+ StringUtils.replace(note.getTitle(), "'", "''") + "', '"
-					+ StringUtils.replace(note.getContent(), "'", "''")
-					+ "', '" + dateformat.format(note.getDate_created()) + "',"
-					+ "'" + dateformat.format(date_updated) + "');";
+					+ "('" + note.getUid() + "', "
+					+ sqlLize(note.getTitle()) + ","
+					+ sqlLize(note.getContent())
+					+ ", '" + dateformat.format(note.getDate_created()) + "',"
+					+ "'" + date_updated + "');";
 			queryBuffer.append(queryStr);
 
 		}
@@ -94,9 +94,9 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 				String queryStr = "INSERT INTO " + getTableId()
 				+ " (UID,TITLE,CONTENT,DATE_CREATED,DATE_UPDATED) VALUES "
 				+ "('" + note.getUid() + "', '"
-				+ StringUtils.replace(note.getTitle(), "'", "''") + "', '"
-				+ StringUtils.replace(note.getContent(), "'", "''")
-				+ "', '" + dateformat.format(note.getDate_created()) + "',"
+				+ sqlLize(note.getTitle()) + ","
+				+ sqlLize(note.getContent())
+				+ ", '" + dateformat.format(note.getDate_created()) + "',"
 				+ "'" + dateformat.format(note.getDate_updated()) + "');";
 				ArrayList<HashMap<String, String>> insert_result = service.create_sync(
 						queryStr, true);

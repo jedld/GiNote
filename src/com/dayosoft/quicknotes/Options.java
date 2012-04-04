@@ -7,6 +7,7 @@ import java.util.HashMap;
 import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.FTQueryCompleteListener;
 import com.dayosoft.utils.FusionTableService;
+import com.dayosoft.utils.GoogleFTSyncer;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
 
@@ -48,6 +49,7 @@ public class Options extends Activity implements OnClickListener,
 	EditText suffixField, tableNameField;
 	GoogleAccountManager accountManager;
 	SharedPreferences settings;
+	Button syncFT;
 	private static final String TAG = "Ginote";
 	String[] items = {}, table_ids = {};
 	GoogleCredential credential = new GoogleCredential();
@@ -68,6 +70,11 @@ public class Options extends Activity implements OnClickListener,
 		settings = getSharedPreferences("ginote_settings", MODE_PRIVATE);
 		CheckBox useGPS = (CheckBox) findViewById(R.id.UseGPS);
 		CheckBox autoAddNote = (CheckBox) findViewById(R.id.autoAddNote);
+		syncFT = (Button) findViewById(R.id.buttonSync);
+		if (getAuthToken()!=null) {
+			syncFT.setEnabled(true);
+		}
+		
 		DialogUtils.linkBoxToPrefs(useGPS, settings, "use_gps");
 		DialogUtils.linkBoxToPrefs(autoAddNote, settings, "auto_add_note");
 
@@ -75,12 +82,17 @@ public class Options extends Activity implements OnClickListener,
 		tableNameField = (EditText) findViewById(R.id.editTextTableName);
 		tableNameField.setText(getTableName());
 		setupGoogleAccount.setOnClickListener(this);
+		syncFT.setOnClickListener(this);
 		accountManager = new GoogleAccountManager(this);
 	}
 
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
+		case R.id.buttonSync:
+			GoogleFTSyncer syncer = new GoogleFTSyncer(this, syncFT);
+			syncer.execute();
+			break;
 		case R.id.buttonFusionTableSync:
 			accountManager.manager.getAuthTokenByFeatures(
 					GoogleAccountManager.ACCOUNT_TYPE, AUTH_TOKEN_TYPE, null,
@@ -151,9 +163,9 @@ public class Options extends Activity implements OnClickListener,
 				FusionTableService service = new FusionTableService(
 						getAuthToken());
 				service.create(
-						"CREATE TABLE "
+						"CREATE TABLE '"
 								+ value
-								+ " (UID: STRING, TITLE: STRING, CONTENT: STRING, DATE_CREATED: DATETIME, DATE_UPDATED: NUMBER)",
+								+ "' (UID: STRING, TITLE: STRING, CONTENT: STRING, DATE_CREATED: DATETIME, DATE_UPDATED: NUMBER)",
 						true, new FTQueryCompleteListener() {
 							@Override
 							public void onQueryComplete(
@@ -226,6 +238,7 @@ public class Options extends Activity implements OnClickListener,
 		editor.putString("sync_table", name);
 		editor.commit();
 		tableNameField.setText(name);
+		syncFT.setEnabled(true);
 	}
 
 	private String getTableName() {

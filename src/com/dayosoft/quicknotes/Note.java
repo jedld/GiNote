@@ -81,15 +81,17 @@ public class Note implements Serializable {
 		this.date_created = date_created;
 	}
 
-	public Date getDate_updated() {
+	Long date_updated;
+	
+	public Long getDate_updated() {
 		return date_updated;
 	}
 
-	public void setDate_updated(Date date_updated) {
+	public void setDate_updated(Long date_updated) {
 		this.date_updated = date_updated;
 	}
 
-	Date date_created, date_updated;
+	Date date_created;
 
 	public void addMeta(NoteMeta noteMeta) {
 		meta.add(noteMeta);
