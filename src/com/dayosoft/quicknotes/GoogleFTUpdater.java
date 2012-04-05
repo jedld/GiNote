@@ -29,15 +29,13 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	TreeMap<String, String> validTableSchema = new TreeMap<String, String>();
 
-	
 	public GoogleFTUpdater(Context c) {
 		this.context = c;
 		this.settings = c.getSharedPreferences("ginote_settings",
 				c.MODE_PRIVATE);
 		this.helper = new DictionaryOpenHelper(c);
 		this.service = new FusionTableService(getAuthToken());
-		
-		
+
 		validTableSchema.put("UID", FusionTableService.STRING);
 		validTableSchema.put("TITLE", FusionTableService.STRING);
 		validTableSchema.put("CONTENT", FusionTableService.STRING);
@@ -74,7 +72,7 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 					+ "'<Point><coordinates>" + note.getLongitude() + ","
 					+ note.getLatitude() + "</coordinates></Point>'" + ", '"
 					+ dateformat.format(note.getDate_created()) + "'," + "'"
-					+ date_updated + "' , " +sync_ts+" , 0);";
+					+ date_updated + "' , " + sync_ts + " , 0);";
 			queryBuffer.append(queryStr);
 
 		}
@@ -82,7 +80,7 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 				queryBuffer.toString(), true);
 		if (result.size() == notes.length) {
 			for (Note note : notes) {
-				helper.touch(note.id, sync_ts );
+				helper.touch(note.id, sync_ts);
 			}
 		}
 	}
@@ -120,19 +118,32 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 				long ft_sync_ts = Long.parseLong(result.get(0).get("SYNC_TS"));
 
 				if (ft_sync_ts == note.getSync_ts()) {
-					long sync_ts = System.currentTimeMillis();
-					String queryStr = "UPDATE " + getTableId()
-							+ " SET TITLE = " + sqlLize(note.getTitle())
-							+ ", POSITION = '<Point><coordinates>"
-							+ note.getLongitude() + "," + note.getLatitude()
-							+ "</coordinates></Point>'" + ", CONTENT = "
-							+ sqlLize(note.getContent()) + " , DATE_UPDATED = "
-							+ note.getDate_updated() + ", SYNC_TS = " + sync_ts
-							+ " WHERE ROWID = '" + rowid + "';";
-					ArrayList<HashMap<String, String>> update_result = service
-							.create_sync(queryStr, true);
-					if (update_result != null) {
-						helper.touch(note.getId(), sync_ts);
+					if (note.getDelete_pending() == 0) {
+						long sync_ts = System.currentTimeMillis();
+						String queryStr = "UPDATE " + getTableId()
+								+ " SET TITLE = " + sqlLize(note.getTitle())
+								+ ", POSITION = '<Point><coordinates>"
+								+ note.getLongitude() + ","
+								+ note.getLatitude()
+								+ "</coordinates></Point>'" + ", CONTENT = "
+								+ sqlLize(note.getContent())
+								+ " , DATE_UPDATED = " + note.getDate_updated()
+								+ ", SYNC_TS = " + sync_ts + " WHERE ROWID = '"
+								+ rowid + "';";
+						ArrayList<HashMap<String, String>> update_result = service
+								.create_sync(queryStr, true);
+						if (update_result != null) {
+							helper.touch(note.getId(), sync_ts);
+						}
+					} else {
+						String queryStr = "UPDATE " + getTableId()
+								+ " SET IS_DELETED = 1 WHERE ROWID = '" + rowid
+								+ "';";
+						ArrayList<HashMap<String, String>> update_result = service
+								.create_sync(queryStr, true);
+						if (update_result != null) {
+							helper.delete(note.getId());
+						}
 					}
 				} else {
 					// only goes here if someone else changed it before your

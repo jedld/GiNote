@@ -99,7 +99,8 @@ public class AddNotes extends Activity implements LocationFixedListener {
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							helper.delete(currentNoteId);
+							helper.touchForDelete(currentNoteId);
+							helper.onDataChanged();
 							AddNotes.this.finish();
 						}
 

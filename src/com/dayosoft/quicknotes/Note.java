@@ -10,6 +10,15 @@ public class Note implements Serializable {
 	private int ft_dirty;
 	String title, content, uid;
 	long sync_ts;
+	int delete_pending;
+
+	public int getDelete_pending() {
+		return delete_pending;
+	}
+
+	public void setDelete_pending(int delete_pending) {
+		this.delete_pending = delete_pending;
+	}
 
 	public long getSync_ts() {
 		return sync_ts;

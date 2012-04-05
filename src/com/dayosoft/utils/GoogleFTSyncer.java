@@ -73,7 +73,7 @@ public class GoogleFTSyncer extends AsyncTask {
 		if (!this.getTableId().equalsIgnoreCase("")) {
 			ArrayList<HashMap<String, String>> result = service
 					.query_sync(
-							"SELECT ROWID,UID,TITLE,CONTENT,POSITION,DATE_CREATED,DATE_UPDATED,SYNC_TS FROM "
+							"SELECT ROWID,UID,TITLE,CONTENT,POSITION,DATE_CREATED,DATE_UPDATED,SYNC_TS,IS_DELETED FROM "
 									+ getTableId()
 									+ " WHERE DATE_UPDATED >= "
 									+ helper.getLastFtSync(), true);
@@ -84,23 +84,26 @@ public class GoogleFTSyncer extends AsyncTask {
 				note_ft.setTitle(item.get("TITLE"));
 				note_ft.setContent(item.get("CONTENT"));
 				note_ft.setSync_ts(Long.parseLong(item.get("SYNC_TS")));
+				note_ft.setDelete_pending(Integer.parseInt(item
+						.get("IS_DELETED")));
 				Document document = DialogUtils.getDomElement(item
 						.get("POSITION"));
 				String longlat[] = StringUtils.split(document.getChildNodes()
 						.item(0).getTextContent(), ',');
 				double longitude = Double.parseDouble(longlat[0]);
 				double latitude = Double.parseDouble(longlat[1]);
-				
+
 				note_ft.setLongitude(longitude);
 				note_ft.setLatitude(latitude);
-				
-				if (note_ft.getLatitude()!=0 && note_ft.getLongitude()!=0) {
+
+				if (note_ft.getLatitude() != 0 && note_ft.getLongitude() != 0) {
 					NoteMeta meta = new NoteMeta();
 					meta.setType(NoteMeta.GOOGLEMAPSURL);
-					meta.setResource_url(GoogleMapsLocation.generateMapsUrl(latitude, longitude));
+					meta.setResource_url(GoogleMapsLocation.generateMapsUrl(
+							latitude, longitude));
 					note_ft.addMeta(meta);
 				}
-				
+
 				try {
 					note_ft.setDate_created(dateformat.parse(item
 							.get("DATE_CREATED")));
@@ -113,17 +116,23 @@ public class GoogleFTSyncer extends AsyncTask {
 				if (note != null) {
 					if ((note.getDate_updated() < note_ft.getDate_updated())
 							&& (note_ft.getFt_dirty() == 0)) {
-						note.setTitle(note_ft.getTitle());
-						note.setContent(note_ft.getContent());
-						note.setDate_updated(note_ft.getDate_updated());
-						note.setLatitude(note_ft.getLatitude());
-						note.setLongitude(note_ft.getLongitude());
-						helper.persist(note);
-						helper.touch(note.getId(), note_ft.getSync_ts());
+						if (note_ft.getDelete_pending() == 1) {
+							helper.delete(note.getId());
+						} else {
+							note.setTitle(note_ft.getTitle());
+							note.setContent(note_ft.getContent());
+							note.setDate_updated(note_ft.getDate_updated());
+							note.setLatitude(note_ft.getLatitude());
+							note.setLongitude(note_ft.getLongitude());
+							helper.persist(note);
+							helper.touch(note.getId(), note_ft.getSync_ts());
+						}
 					}
 				} else {
-					helper.persist(note_ft);
-					helper.touch(note_ft.getId(), note_ft.getSync_ts());
+					if (note_ft.getDelete_pending() == 0) {
+						helper.persist(note_ft);
+						helper.touch(note_ft.getId(), note_ft.getSync_ts());
+					}
 				}
 			}
 			helper.touchLastFTSync();

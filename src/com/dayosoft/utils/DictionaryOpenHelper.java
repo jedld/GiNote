@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.dayosoft.quicknotes.GoogleFTUpdater;
 import com.dayosoft.quicknotes.Note;
 import com.dayosoft.quicknotes.NoteMeta;
@@ -23,7 +25,7 @@ import android.util.Log;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 7;
+	private static final int DATABASE_VERSION = 8;
 	private static final String DATABASE_NAME = "QUICKNOTES";
 	private static final String DICTIONARY_TABLE_NAME = "notes";
 	private static final String DICTIONARY_TABLE_CREATE = "CREATE TABLE "
@@ -72,10 +74,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
 	public Vector<Integer> getNoteIds(String query) {
 		Vector<Integer> results = new Vector<Integer>();
-		String whereClause = null;
-		if (query != null) {
-			whereClause = "title LIKE '%" + query + "%'";
-		}
+		
+
+		String wheres[] = {"title LIKE '%" + query + "%'"};
+		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
+		
 		String columns[] = { "id" };
 		Log.d(this.getClass().toString(), "Reading note ids");
 		Cursor notelist = getReadableDatabase().query("notes", columns,
@@ -90,10 +93,8 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public int countNotes(String query) {
-		String whereClause = null;
-		if (query != null) {
-			whereClause = "title LIKE '%" + query + "%'";
-		}
+		String wheres[] = {"title LIKE '%" + query + "%'"};
+		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
 		String columns[] = { "count(id) as total" };
 		Cursor notelist = getReadableDatabase().query("notes", columns,
 				whereClause, null, null, null, "date_created DESC LIMIT 100");
@@ -116,7 +117,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	public void listUnsyncedNotes(NoteSyncer sync) {
 
 		String columns[] = { "id", "title", "content", "date_created",
-				"date_updated", "uid", "sync_ts", "latitude","longitude"};
+				"date_updated", "uid", "sync_ts","latitude","longitude","delete_pending"};
 
 		String whereClause = "SYNC_TS = 0 OR FT_DIRTY = 1";
 		int total_records = count("NOTES", whereClause);
@@ -139,6 +140,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 					note.setSync_ts(notelist.getLong(6));
 					note.setLatitude(notelist.getDouble(7));
 					note.setLongitude(notelist.getDouble(8));
+					note.setDelete_pending(notelist.getInt(9));
 					SimpleDateFormat dateformat = new SimpleDateFormat(
 							"yyyy-MM-dd HH:mm:ss");
 					try {
@@ -178,15 +180,25 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
 	}
 
+	private String getWhereClause(String wheres[]) {
+		ArrayList <String>whereClauses = new ArrayList<String>();
+		whereClauses.add("DELETE_PENDING = 0");
+		if (wheres != null) {
+			for(String where : wheres) {
+				whereClauses.add(where);
+			}
+		}
+		return StringUtils.join(whereClauses, " AND ");
+	}
+	
 	public List<Note> listNotes(String query) {
 		Vector<Note> returnList = new Vector<Note>();
 
 		String columns[] = { "id", "title", "content", "date_created" };
 
-		String whereClause = null;
-		if (query != null) {
-			whereClause = "title LIKE '%" + query + "%'";
-		}
+		String wheres[] = {"title LIKE '%" + query + "%'"};
+		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
+		
 		Cursor notelist = getReadableDatabase().query("notes", columns,
 				whereClause, null, null, null, "date_created DESC LIMIT 1000");
 		if (notelist.moveToFirst()) {
@@ -326,6 +338,14 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		touch(id, System.currentTimeMillis());
 	}
 	
+	public void touchForDelete(int id) {
+		SQLiteDatabase db = getWritableDatabase();
+		db.execSQL("UPDATE NOTES SET DELETE_PENDING = 1, FT_DIRTY = 1"
+				+ " WHERE id=" + id);
+		db.close();
+		onDataChanged();
+	}
+	
 	public void touch(int id, long ts) {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("UPDATE NOTES SET FT_DIRTY = 0, SYNC_TS=" + ts
@@ -422,7 +442,6 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		db.delete("notes", "id=" + id, null);
 		db.delete("NOTE_META", "NOTE_ID=" + id, null);
 		db.close();
-		onDataChanged();
 	}
 
 	@Override
@@ -459,7 +478,10 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				break;
 			case 7:
 				db.execSQL("ALTER TABLE NOTES ADD COLUMN FT_DIRTY INTEGER DEFAULT 0");
-				break;				
+				break;
+			case 8:
+				db.execSQL("ALTER TABLE NOTES ADD COLUMN DELETE_PENDING INTEGER DEFAULT 0");
+				break;
 			}
 		}
 	}
