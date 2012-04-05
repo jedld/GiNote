@@ -137,6 +137,14 @@ public class GoogleMapsLocation implements LocationListener {
 		return tinyurl;
 	}
 
+	public static String generateMapsUrl(double latitude, double longitude) {
+		return  "http://maps.google.com/maps/api/staticmap?center="
+			+ latitude
+			+ ","
+			+ longitude
+			+ "&zoom=17&size=400x400&sensor=true&markers=color:blue|label:A|"
+			+ latitude + "," + longitude;	
+	}
 	@Override
 	public void onLocationChanged(Location location) {
 		if (isBetterLocation(location, previousLocation)) {
@@ -146,12 +154,7 @@ public class GoogleMapsLocation implements LocationListener {
 
 			double latitude = location.getLatitude();
 			double longitude = location.getLongitude();
-			String url = "http://maps.google.com/maps/api/staticmap?center="
-					+ latitude
-					+ ","
-					+ longitude
-					+ "&zoom=17&size=400x400&sensor=true&markers=color:blue|label:A|"
-					+ latitude + "," + longitude;
+			String url = generateMapsUrl(latitude, longitude);
 
 			String tinyurlized = latitude + "," + longitude;
 

@@ -7,6 +7,7 @@ import java.util.Vector;
 
 public class Note implements Serializable {
 	int id;
+	private int ft_dirty;
 	String title, content, uid;
 	long sync_ts;
 
@@ -82,7 +83,7 @@ public class Note implements Serializable {
 	}
 
 	Long date_updated;
-	
+
 	public Long getDate_updated() {
 		return date_updated;
 	}
@@ -115,6 +116,14 @@ public class Note implements Serializable {
 			}
 		}
 		return list;
+	}
+
+	public void setFt_dirty(int ft_dirty) {
+		this.ft_dirty = ft_dirty;
+	}
+
+	public int getFt_dirty() {
+		return ft_dirty;
 	}
 
 }

@@ -34,22 +34,6 @@
 		</TableRow>
 	</TableLayout>
 
-	<TextView
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:text="Title"
-	    android:textSize="18sp" />
-
-	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:stretchColumns="0">
-		<TableRow>
-			<EditText android:text="" android:gravity="top" android:id="@+id/NoteTitle"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"></EditText>
-			<FrameLayout />
-		</TableRow>
-	</TableLayout>
-
 	<LinearLayout
 	    android:id="@+id/linearLayoutMeta"
 	    android:layout_width="match_parent"
@@ -86,4 +70,30 @@
 			android:layout_weight="2"
 			android:padding="10dip" android:layout_height="fill_parent"></EditText>
 	</LinearLayout>
+
+	<TextView
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:text="Tags/Title"
+	    android:textSize="18sp" />
+
+	<TableLayout
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:stretchColumns="0" >
+
+	    <TableRow>
+
+	        <EditText
+	            android:id="@+id/NoteTitle"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="top" />
+
+	        <FrameLayout>
+	        </FrameLayout>
+	    </TableRow>
+	</TableLayout>
+
 </LinearLayout>

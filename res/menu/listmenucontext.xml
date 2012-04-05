@@ -1,0 +1,4 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/itemSync" android:titleCondensed="Sync" android:title="Synchronize with Google Tables"></item>
+    </menu>

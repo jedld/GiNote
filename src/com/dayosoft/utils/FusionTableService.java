@@ -33,7 +33,12 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class FusionTableService extends
 		AsyncTask<Void, Void, ArrayList<HashMap<String, String>>> {
-
+	
+	public static final String STRING = "string";
+	public static final String LOCATION = "location";
+	public static final String DATETIME = "datetime";
+	public static final String NUMBER = "number";
+	
 	String auth_token;
 	String service = "query";
 	HashMap<String, String> other_params = new HashMap<String, String>();
@@ -125,7 +130,7 @@ public class FusionTableService extends
 					HashMap<String, String> row = new HashMap<String, String>();
 
 					for (int i = 0; i < nextLine.length; i++) {
-						row.put(columns[i], nextLine[i]);
+						row.put(columns[i].toUpperCase(), nextLine[i]);
 					}
 					resultList.add(row);
 				}

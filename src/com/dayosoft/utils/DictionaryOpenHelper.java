@@ -23,7 +23,7 @@ import android.util.Log;
 
 public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 6;
+	private static final int DATABASE_VERSION = 7;
 	private static final String DATABASE_NAME = "QUICKNOTES";
 	private static final String DICTIONARY_TABLE_NAME = "notes";
 	private static final String DICTIONARY_TABLE_CREATE = "CREATE TABLE "
@@ -43,11 +43,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public void onDataChanged() {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO) {
-			manager.dataChanged();
-		}
+		onDataChanged(true);
+	}
 
-		if (DialogUtils.hasINet()) {
+	public void onDataChanged(boolean ft_sync) {
+		if (DialogUtils.hasINet() && ft_sync) {
 			GoogleFTUpdater updater = new GoogleFTUpdater(context);
 			updater.execute();
 		}
@@ -77,6 +77,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			whereClause = "title LIKE '%" + query + "%'";
 		}
 		String columns[] = { "id" };
+		Log.d(this.getClass().toString(), "Reading note ids");
 		Cursor notelist = getReadableDatabase().query("notes", columns,
 				whereClause, null, null, null, "date_created DESC LIMIT 100");
 		if (notelist.moveToFirst()) {
@@ -115,9 +116,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	public void listUnsyncedNotes(NoteSyncer sync) {
 
 		String columns[] = { "id", "title", "content", "date_created",
-				"date_updated", "uid", "sync_ts" };
+				"date_updated", "uid", "sync_ts", "latitude","longitude"};
 
-		String whereClause = "SYNC_TS <= 0";
+		String whereClause = "SYNC_TS = 0 OR FT_DIRTY = 1";
 		int total_records = count("NOTES", whereClause);
 		for (int offset = 0; offset <= total_records; offset += 500) {
 			Cursor notelist = getReadableDatabase().query("notes", columns,
@@ -136,6 +137,8 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 					Log.d(this.getClass().toString(),
 							"loading uid " + notelist.getString(5));
 					note.setSync_ts(notelist.getLong(6));
+					note.setLatitude(notelist.getDouble(7));
+					note.setLongitude(notelist.getDouble(8));
 					SimpleDateFormat dateformat = new SimpleDateFormat(
 							"yyyy-MM-dd HH:mm:ss");
 					try {
@@ -238,7 +241,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		versionCursor.close();
 		return date;
 	}
-	
+
 	public String getLastModified() {
 		String date = "";
 		SQLiteDatabase db = getReadableDatabase();
@@ -253,20 +256,23 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public Note load(String uid) {
-		String columns[] = { "id", "title", "content", "uid", "date_created", "date_updated",
-				"sync_ts" };
+		String columns[] = { "id", "title", "content", "uid", "date_created",
+				"date_updated", "sync_ts", "ft_dirty" };
 		SQLiteDatabase db = getReadableDatabase();
-		Cursor notelist = db.query("notes", columns, "uid='" + uid + "'", null, null,
-				null, "date_created DESC LIMIT 100");
+		Cursor notelist = db.query("notes", columns, "uid='" + uid + "'", null,
+				null, null, "date_created DESC LIMIT 100");
+		Log.d(this.getClass().toString(), "loading object uid = " + uid);
 		if (notelist.moveToFirst()) {
+			Log.d(this.getClass().toString(), "object uid = " + uid + " loaded.");
 			Note note = new Note();
-			note.setId(note.getId());
+			note.setId(notelist.getInt(0));
 			note.setTitle(notelist.getString(1));
 			note.setContent(notelist.getString(2));
 			note.setUid(notelist.getString(3));
 			note.setDate_updated(notelist.getLong(5));
 			note.setSync_ts(notelist.getLong(6));
-			
+			note.setFt_dirty(notelist.getInt(7));
+
 			try {
 				note.setDate_created(dateformat.parse(notelist.getString(4)));
 			} catch (ParseException e) {
@@ -281,10 +287,10 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		notelist.close();
 		return null;
 	}
-	
+
 	public Note load(int id) {
 		String columns[] = { "id", "title", "content", "uid", "date_created",
-				"date_updated", "sync_ts" };
+				"date_updated", "sync_ts", "latitude", "longitude", "ft_dirty" };
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor notelist = db.query("notes", columns, "id=" + id, null, null,
 				null, "date_created DESC LIMIT 100");
@@ -294,9 +300,13 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			note.setTitle(notelist.getString(1));
 			note.setContent(notelist.getString(2));
 			note.setUid(notelist.getString(3));
-		
+
 			note.setDate_updated(notelist.getLong(5));
 			note.setSync_ts(notelist.getLong(6));
+			note.setLatitude(notelist.getDouble(7));
+			note.setLongitude(notelist.getDouble(8));
+			note.setFt_dirty(notelist.getInt(9));
+			
 			try {
 				note.setDate_created(dateformat.parse(notelist.getString(4)));
 			} catch (ParseException e) {
@@ -313,15 +323,20 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public void touch(int id) {
+		touch(id, System.currentTimeMillis());
+	}
+	
+	public void touch(int id, long ts) {
 		SQLiteDatabase db = getWritableDatabase();
-		db.execSQL("UPDATE NOTES SET SYNC_TS=" + System.currentTimeMillis()
+		db.execSQL("UPDATE NOTES SET FT_DIRTY = 0, SYNC_TS=" + ts
 				+ " WHERE id=" + id);
 		db.close();
 	}
-	
+
 	public void touchLastFTSync() {
 		SQLiteDatabase db = getWritableDatabase();
-		db.execSQL("UPDATE NOTE_VERSION SET LAST_FT_SYNC = " + System.currentTimeMillis());
+		db.execSQL("UPDATE NOTE_VERSION SET LAST_FT_SYNC = "
+				+ System.currentTimeMillis());
 		db.close();
 	}
 
@@ -331,9 +346,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		ContentValues newValues = new ContentValues();
 		if (note.getId() == 0) {
 			newRecord = true;
+			Log.d(this.getClass().toString(),"Persist new record");
 		} else {
 			row_id = note.getId();
 			newValues.put("ID", row_id);
+			Log.d(this.getClass().toString(),"update record");
 		}
 
 		if (note.getTitle() == null || note.getTitle().trim().equals("")) {
@@ -349,6 +366,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		}
 		newValues.put("TITLE", note.getTitle());
 		newValues.put("CONTENT", note.getContent());
+		newValues.put("LATITUDE", note.getLatitude());
+		newValues.put("LONGITUDE", note.getLongitude());
+		
 		SimpleDateFormat dateformat = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss");
 		if (note.getDate_created() == null)
@@ -362,12 +382,15 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = getWritableDatabase();
 
 		if (newRecord) {
-			newValues.put("DATE_UPDATED", note.getDate_updated() == null ?  System.currentTimeMillis() : note.getDate_updated());
+			newValues.put("DATE_UPDATED",
+					note.getDate_updated() == null ? System.currentTimeMillis()
+							: note.getDate_updated());
 			newValues.put("SYNC_TS", note.getSync_ts());
-			newValues.put("UID",  note.getUid()==null ? UUID.randomUUID().toString() : note.getUid());
+			newValues.put("UID", note.getUid() == null ? UUID.randomUUID()
+					.toString() : note.getUid());
 		} else {
 			if (note.getSync_ts() > 0) {
-				newValues.put("SYNC_TS", -1);
+				newValues.put("FT_DIRTY", 1);
 			}
 			newValues.put("DATE_UPDATED", System.currentTimeMillis());
 			newValues.put("UID", note.getUid());
@@ -385,7 +408,12 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		}
 		db.execSQL("UPDATE NOTE_VERSION SET LAST_MODIFIED=date('now')");
 		db.close();
+		return row_id;
+	}
+
+	public long persistAndSync(Note note) {
 		onDataChanged();
+		long row_id = persist(note);
 		return row_id;
 	}
 
@@ -410,7 +438,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 						+ " ( ID INTEGER PRIMARY KEY ASC, NOTE_ID INTEGER, "
 						+ " META_TYPE INTEGER, RESOURCE_URL TEXT);";
 				db.execSQL(sqlStr1);
-				String sqlStr2 = "ALTER TABLE NOTES ADD COLUMN LONGTITUDE REAL";
+				String sqlStr2 = "ALTER TABLE NOTES ADD COLUMN LONGITUDE REAL";
 				String sqlStr3 = "ALTER TABLE NOTES ADD COLUMN LATITUDE REAL";
 				db.execSQL(sqlStr2);
 				db.execSQL(sqlStr3);
@@ -429,6 +457,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			case 6:
 				db.execSQL("ALTER TABLE NOTE_VERSION ADD COLUMN LAST_FT_SYNC INTEGER DEFAULT 0");
 				break;
+			case 7:
+				db.execSQL("ALTER TABLE NOTES ADD COLUMN FT_DIRTY INTEGER DEFAULT 0");
+				break;				
 			}
 		}
 	}

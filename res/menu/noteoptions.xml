@@ -4,7 +4,7 @@
 		android:id="@+id/about" android:icon="@drawable/info"></item>
 	<item android:id="@+id/itemOptions" android:title="Options"
 		android:icon="@drawable/options"></item>
-	<item android:id="@+id/itemLockGPS" android:showAsAction="always" android:title="Tag GPS"></item>
-	<item android:id="@+id/itemCamera" android:showAsAction="always" android:title="Camera"></item>
-	<item android:id="@+id/itemGallery" android:showAsAction="always" android:title="Gallery"></item>
+	<item android:id="@+id/itemLockGPS" android:showAsAction="always" android:title="Tag GPS" android:icon="@drawable/gps"></item>
+	<item android:id="@+id/itemCamera" android:showAsAction="always" android:title="Camera" android:icon="@drawable/camera"></item>
+	<item android:id="@+id/itemGallery" android:showAsAction="always" android:title="Gallery" android:icon="@drawable/picture"></item>
 </menu>

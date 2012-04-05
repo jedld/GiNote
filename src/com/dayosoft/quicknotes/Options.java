@@ -71,10 +71,10 @@ public class Options extends Activity implements OnClickListener,
 		CheckBox useGPS = (CheckBox) findViewById(R.id.UseGPS);
 		CheckBox autoAddNote = (CheckBox) findViewById(R.id.autoAddNote);
 		syncFT = (Button) findViewById(R.id.buttonSync);
-		if (getAuthToken()!=null) {
+		if (getAuthToken() != null) {
 			syncFT.setEnabled(true);
 		}
-		
+
 		DialogUtils.linkBoxToPrefs(useGPS, settings, "use_gps");
 		DialogUtils.linkBoxToPrefs(autoAddNote, settings, "auto_add_note");
 
@@ -160,25 +160,22 @@ public class Options extends Activity implements OnClickListener,
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				final String value = input.getText().toString();
-				FusionTableService service = new FusionTableService(
-						getAuthToken());
-				service.create(
-						"CREATE TABLE '"
-								+ value
-								+ "' (UID: STRING, TITLE: STRING, CONTENT: STRING, DATE_CREATED: DATETIME, DATE_UPDATED: NUMBER)",
-						true, new FTQueryCompleteListener() {
-							@Override
-							public void onQueryComplete(
-									ArrayList<HashMap<String, String>> result) {
-								Toast.makeText(Options.this, "Table Created.",
-										Toast.LENGTH_SHORT).show();
-								String table_id = result.get(0).get("tableid");
-								Log.d(this.getClass().toString(),
-										"storing table " + table_id);
-								setTableName(value);
-								setTableId(table_id);
-							}
-						});
+				final GoogleFTUpdater updater = new GoogleFTUpdater(
+						Options.this);
+				updater.createTable(value, new FTQueryCompleteListener() {
+					@Override
+					public void onQueryComplete(
+							ArrayList<HashMap<String, String>> result) {
+						Toast.makeText(Options.this, "Table Created.",
+								Toast.LENGTH_SHORT).show();
+						final String table_id = result.get(0).get("TABLEID");
+						Log.d(this.getClass().toString(), "storing table "
+								+ table_id);
+
+						setTableName(value);
+						setTableId(table_id);
+					}
+				});
 			}
 		});
 
@@ -201,24 +198,53 @@ public class Options extends Activity implements OnClickListener,
 		tablenames.add("Create New Table");
 		tableids.add("");
 		for (HashMap<String, String> map : result) {
-			tablenames.add(map.get("name"));
-			tableids.add(map.get("table id"));
+			tablenames.add(map.get("NAME"));
+			tableids.add(map.get("TABLE ID"));
 		}
 
 		table_ids = tableids.toArray(table_ids);
 		items = tablenames.toArray(items);
-
+		Log.d(this.getClass().toString(), "onQueryComplete()");
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Pick a table to sync to");
 		builder.setItems(items, new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int item) {
-				if (item == 0) {
+				final int item_index = item;
+				if (item_index == 0) {
 					promptTableName();
 				} else {
-					setTableName(items[item]);
-					setTableId(table_ids[item]);
+					final GoogleFTUpdater updater = new GoogleFTUpdater(
+							Options.this);
+					updater.describeTable(table_ids[item_index],
+							new FTQueryCompleteListener() {
+								@Override
+								public void onQueryComplete(
+										ArrayList<HashMap<String, String>> result) {
+									// Check for table structure compatibility
+									HashMap<String, String> targetTableSchema = new HashMap<String, String>();
+									for (HashMap<String, String> types : result) {
+										targetTableSchema.put(
+												types.get("NAME"),
+												types.get("TYPE"));
+									}
+									
+									//make sure target table is structurally correct
+									if (updater
+											.isValidSchema(targetTableSchema)) {
+										setTableName(items[item_index]);
+										setTableId(table_ids[item_index]);
+									} else {
+										AlertDialog.Builder errorAlert = new AlertDialog.Builder(Options.this);
+										errorAlert.setMessage("Sorry the table " + items[item_index] + " does not have the correct table structure for GiNote FT. " +
+												"Choose \"Create New Table\" to create a new one or choose another table.");
+										AlertDialog alert = errorAlert.create();
+										alert.show();
+									}
+
+								}
+							});
 				}
 			}
 		});

@@ -6,27 +6,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.dayosoft.quicknotes.ListNotes;
 import com.dayosoft.quicknotes.Note;
+import com.dayosoft.quicknotes.NoteMeta;
 
 public class GoogleFTSyncer extends AsyncTask {
 	SharedPreferences settings;
 
 	Context context;
+	ProgressDialog progress_dialog;
 	static final String PREF_AUTH_TOKEN = "authToken";
 	DictionaryOpenHelper helper;
 	FusionTableService service;
 	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	Button button;
+	View button;
 
-	public GoogleFTSyncer(Context c, Button button) {
+	public GoogleFTSyncer(Context c, View button) {
 		this.context = c;
 		this.settings = c.getSharedPreferences("ginote_settings",
 				c.MODE_PRIVATE);
@@ -40,39 +46,61 @@ public class GoogleFTSyncer extends AsyncTask {
 	}
 
 	@Override
+	protected void onPreExecute() {
+		// TODO Auto-generated method stub
+		super.onPreExecute();
+		progress_dialog = ProgressDialog.show(context, "",
+				"Syncing. Please wait...", true);
+
+		if (button != null)
+			button.setEnabled(false);
+	}
+
+	@Override
 	protected void onPostExecute(Object result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		if (button != null)
 			button.setEnabled(true);
-		Toast.makeText(context, "Sync in progress", Toast.LENGTH_SHORT);
-	}
-
-	@Override
-	protected void onPreExecute() {
-		// TODO Auto-generated method stub
-		super.onPreExecute();
-		if (button != null)
-			button.setEnabled(false);
-		
+		if (progress_dialog != null) {
+			progress_dialog.dismiss();
+		}
 		ListNotes.listAdapter.notifyInvalidate();
 	}
 
 	@Override
 	protected Object doInBackground(Object... params) {
 		if (!this.getTableId().equalsIgnoreCase("")) {
-			ArrayList<HashMap<String, String>> result = service.query_sync(
-					"SELECT ROWID,UID,TITLE,CONTENT,DATE_CREATED,DATE_UPDATED FROM "
-							+ getTableId() + " WHERE DATE_UPDATED >= "
-							+ helper.getLastFtSync(), true);
+			ArrayList<HashMap<String, String>> result = service
+					.query_sync(
+							"SELECT ROWID,UID,TITLE,CONTENT,POSITION,DATE_CREATED,DATE_UPDATED,SYNC_TS FROM "
+									+ getTableId()
+									+ " WHERE DATE_UPDATED >= "
+									+ helper.getLastFtSync(), true);
 			for (HashMap<String, String> item : result) {
 				Note note_ft = new Note();
-				String rowid = item.get("rowid");
+				String rowid = item.get("ROWID");
 				note_ft.setUid(item.get("UID"));
 				note_ft.setTitle(item.get("TITLE"));
 				note_ft.setContent(item.get("CONTENT"));
+				note_ft.setSync_ts(Long.parseLong(item.get("SYNC_TS")));
+				Document document = DialogUtils.getDomElement(item
+						.get("POSITION"));
+				String longlat[] = StringUtils.split(document.getChildNodes()
+						.item(0).getTextContent(), ',');
+				double longitude = Double.parseDouble(longlat[0]);
+				double latitude = Double.parseDouble(longlat[1]);
 				
-				note_ft.setSync_ts(System.currentTimeMillis());
+				note_ft.setLongitude(longitude);
+				note_ft.setLatitude(latitude);
+				
+				if (note_ft.getLatitude()!=0 && note_ft.getLongitude()!=0) {
+					NoteMeta meta = new NoteMeta();
+					meta.setType(NoteMeta.GOOGLEMAPSURL);
+					meta.setResource_url(GoogleMapsLocation.generateMapsUrl(latitude, longitude));
+					note_ft.addMeta(meta);
+				}
+				
 				try {
 					note_ft.setDate_created(dateformat.parse(item
 							.get("DATE_CREATED")));
@@ -83,28 +111,19 @@ public class GoogleFTSyncer extends AsyncTask {
 				note_ft.setDate_updated(Long.parseLong(item.get("DATE_UPDATED")));
 				Note note = helper.load(item.get("UID"));
 				if (note != null) {
-					if (note.getDate_updated() > note_ft.getDate_updated()) {
-						String queryStr = "UPDATE " + getTableId()
-								+ " SET TITLE = " + sqlLize(note.getTitle())
-								+ ", CONTENT = " + sqlLize(note.getContent())
-								+ " , DATE_UPDATED = " + note.getDate_updated()
-								+ " WHERE ROWID = '" + rowid + "';";
-						ArrayList<HashMap<String, String>> update_result = service
-								.create_sync(queryStr, true);
-						if (update_result != null) {
-							helper.touch(note.getId());
-						}
-					} else if (note.getDate_updated() < note_ft
-							.getDate_updated()) {
+					if ((note.getDate_updated() < note_ft.getDate_updated())
+							&& (note_ft.getFt_dirty() == 0)) {
 						note.setTitle(note_ft.getTitle());
 						note.setContent(note_ft.getContent());
 						note.setDate_updated(note_ft.getDate_updated());
+						note.setLatitude(note_ft.getLatitude());
+						note.setLongitude(note_ft.getLongitude());
 						helper.persist(note);
-						helper.touch(note.getId());
+						helper.touch(note.getId(), note_ft.getSync_ts());
 					}
 				} else {
 					helper.persist(note_ft);
-					helper.touch(note_ft.getId());
+					helper.touch(note_ft.getId(), note_ft.getSync_ts());
 				}
 			}
 			helper.touchLastFTSync();

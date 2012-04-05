@@ -134,7 +134,7 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			for (NoteMeta meta : metalist) {
 				note.addMeta(meta);
 			}
-			helper.persist(note);
+			helper.persistAndSync(note);
 			AddNotes.this.finish();
 		}
 
@@ -161,7 +161,7 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			for (NoteMeta meta : metalist) {
 				note.addMeta(meta);
 			}
-			helper.persist(note);
+			helper.persistAndSync(note);
 			AddNotes.this.finish();
 		}
 

@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.DictionaryOpenHelper;
+import com.dayosoft.utils.GoogleFTSyncer;
 import com.dayosoft.utils.ImageDownloadTask;
 import com.dayosoft.utils.TimeUtils;
 
@@ -42,7 +43,7 @@ public class ListNotes extends Activity {
 	DictionaryOpenHelper helper;
 	public static NoteListAdapter listAdapter;
 	ListView listview;
-	SharedPreferences prefs;
+	SharedPreferences settings;
 	public static final int NOTE_ADDED = 0;
 	public static final int NOTE_UPDATED = 1;
 	public static final int NOTE_DELETED = 2;
@@ -93,6 +94,12 @@ public class ListNotes extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mainmenu, menu);
+		
+		if (getTableName() != null) {
+			MenuItem menuitem = menu.findItem(R.id.itemSync);
+			menuitem.setEnabled(true);
+			menuitem.setVisible(true);
+		}
 		return true;
 	}
 
@@ -105,7 +112,7 @@ public class ListNotes extends Activity {
 		// notesview = (TableLayout) findViewById(R.id.notesList);
 		Button addNoteButton = (Button) findViewById(R.id.addButton);
 		listview = (ListView) findViewById(R.id.list);
-		prefs = getSharedPreferences("ginote_settings", MODE_PRIVATE);
+		settings = getSharedPreferences("ginote_settings", MODE_PRIVATE);
 		// setup simple button navigation
 		addNoteButton.setOnClickListener(DialogUtils.setNavigator(
 				AddNotes.class, this, ListNotes.NOTE_ADDED));
@@ -114,12 +121,13 @@ public class ListNotes extends Activity {
 		listview.setAdapter(listAdapter);
 		listview.setOnItemClickListener(onItemClicked);
 
-		if (prefs.getBoolean("auto_add_note", false)) {
+		if (settings.getBoolean("auto_add_note", false)) {
 			Intent intent = new Intent(ListNotes.this, AddNotes.class);
 
 			ListNotes.this.startActivityForResult(intent,
 					ListNotes.NOTE_UPDATED);
 		}
+
 	}
 
 	@Override
@@ -131,7 +139,7 @@ public class ListNotes extends Activity {
 			// PackageManager.GET_ACTIVITIES).;
 			DialogUtils
 					.showMessageAlert(
-							"GiNote 2.04\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
+							"GiNote 3.00\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
 							this);
 			return true;
 		case R.id.deleteAllOption:
@@ -157,6 +165,11 @@ public class ListNotes extends Activity {
 		case R.id.itemOptions:
 			DialogUtils.switchActivity(Options.class, this);
 			break;
+		case R.id.itemSync:
+			View menuitem = (View) findViewById(R.id.itemSync);
+			GoogleFTSyncer syncer = new GoogleFTSyncer(this, menuitem);
+			syncer.execute();
+			break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -170,6 +183,10 @@ public class ListNotes extends Activity {
 		} else if (requestCode == ListNotes.NOTE_UPDATED) {
 			listAdapter.notifyChange();
 		}
+	}
+
+	private String getTableName() {
+		return settings.getString("sync_table", null);
 	}
 
 }

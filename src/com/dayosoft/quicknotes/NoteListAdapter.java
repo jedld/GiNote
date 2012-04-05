@@ -86,6 +86,7 @@ public class NoteListAdapter implements ListAdapter {
 	@Override
 	public View getView(int index, View convertView, ViewGroup group) {
 		if (idlist == null) {
+			Log.d(this.getClass().toString(), "loading note list");
 			idlist = helper.getNoteIds(query);
 		}
 
@@ -109,7 +110,8 @@ public class NoteListAdapter implements ListAdapter {
 				.findViewById(R.id.yesterdayIndicator);
 		TextView fewdaysIndicator = (TextView) view
 				.findViewById(R.id.fewdaysIndicator);
-
+		
+		
 		todayIndicator.setVisibility(View.GONE);
 		yesterdayIndicator.setVisibility(View.GONE);
 		fewdaysIndicator.setVisibility(View.GONE);
@@ -153,7 +155,7 @@ public class NoteListAdapter implements ListAdapter {
 		} else {
 			todayIndicator.setVisibility(View.GONE);
 		}
-
+	
 		String title = note.getTitle();
 		if (note.getTitle().length() > 30) {
 			title = note.getTitle().substring(0, 30);

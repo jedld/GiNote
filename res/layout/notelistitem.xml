@@ -1,43 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/itempanel"
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="wrap_content" android:paddingBottom="3dip">
-	<TextView android:id="@+id/todayIndicator"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:textSize="12dip" android:text="Today" android:textColor="#000000"
-		android:background="#FFFFFF" android:visibility="gone"
-		android:paddingLeft="8dip"></TextView>
-	<TextView android:id="@+id/yesterdayIndicator"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:textSize="12dip" android:text="Yesterday" android:textColor="#000000"
-		android:background="#FFFFFF" android:visibility="gone"
-		android:paddingLeft="8dip"></TextView>	
-	<TextView android:id="@+id/fewdaysIndicator"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:textSize="12dip" android:text="A few days ago" android:textColor="#000000"
-		android:background="#FFFFFF" android:visibility="gone"
-		android:paddingLeft="8dip"></TextView>				
-	<TextView android:id="@+id/title" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:textSize="25dip"
-		android:paddingLeft="5dip"></TextView>
-	<TextView android:id="@+id/datetime" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:textSize="12dip"
-		android:paddingLeft="5dip"></TextView>
-	<TextView android:id="@+id/gpslocation" android:layout_width="fill_parent"
-		android:visibility="invisible" android:layout_height="wrap_content"
-		android:textSize="12dip" android:paddingLeft="5dip"></TextView>
-	<LinearLayout android:id="@+id/imagepanel"
-		android:visibility="gone" xmlns:android="http://schemas.android.com/apk/res/android"
-		android:orientation="vertical" android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
-		<!-- TextView android:id="@+id/imagepaneltext" android:text="Tap here to 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/itempanel"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="3dip" >
+
+    <TextView
+        android:id="@+id/todayIndicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingLeft="8dip"
+        android:text="Today"
+        android:textColor="#000000"
+        android:textSize="12dip"
+        android:visibility="gone" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/yesterdayIndicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingLeft="8dip"
+        android:text="Yesterday"
+        android:textColor="#000000"
+        android:textSize="12dip"
+        android:visibility="gone" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/fewdaysIndicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingLeft="8dip"
+        android:text="A few days ago"
+        android:textColor="#000000"
+        android:textSize="12dip"
+        android:visibility="gone" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dip"
+        android:textSize="25dip" >
+    </TextView>
+        <TextView
+            android:id="@+id/datetime"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dip"
+            android:textSize="12dip" >
+        </TextView>
+
+    <TextView
+        android:id="@+id/gpslocation"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dip"
+        android:textSize="12dip"
+        android:visibility="invisible" >
+    </TextView>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/imagepanel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <!--
+             TextView android:id="@+id/imagepaneltext" android:text="Tap here to 
 			view image(s)" android:layout_width="fill_parent" android:textSize="18dip" 
 			android:textColor="#5E51E8" android:background="#FFFFFF" android:layout_height="wrap_content" 
-			android:paddingLeft="5dip"></TextView -->
-		<LinearLayout android:id="@+id/images"
-			android:visibility="visible" xmlns:android="http://schemas.android.com/apk/res/android"
-			android:orientation="horizontal" android:layout_width="fill_parent"
-			android:layout_height="wrap_content"></LinearLayout>
-	</LinearLayout>
+			android:paddingLeft="5dip"></TextView
+        -->
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/images"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="visible" >
+        </LinearLayout>
+    </LinearLayout>
+
 </LinearLayout>
