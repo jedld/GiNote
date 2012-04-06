@@ -17,6 +17,7 @@ import com.dayosoft.utils.DictionaryOpenHelper;
 import com.dayosoft.utils.GoogleMapsLocation;
 import com.dayosoft.utils.LocationFixedListener;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -179,10 +180,8 @@ public class AddNotes extends Activity implements LocationFixedListener {
 		helper = new DictionaryOpenHelper(this);
 		Button saveButton = (Button) findViewById(R.id.CreateNewNote);
 		TextView timelabel = (TextView) findViewById(R.id.time);
-		Button cancelButton = (Button) findViewById(R.id.cancel);
 		urlField = (TextView) findViewById(R.id.url);
 		metaContent = (LinearLayout) findViewById(R.id.linearLayoutMeta);
-		cancelButton.setOnClickListener(DialogUtils.closeNavigator(this));
 		saveButton.setOnClickListener(saveNoteListener);
 		// saveButton.getBackground().setColorFilter(0xFF00FF00, Mode.MULTIPLY);
 
@@ -216,8 +215,6 @@ public class AddNotes extends Activity implements LocationFixedListener {
 					"hh:mma MM-dd-yyyy");
 			Button deleteNoteButton = (Button) findViewById(R.id.DeleteNote);
 			deleteNoteButton.setOnClickListener(deleteNoteListener);
-			Button cancelUpdate = (Button) findViewById(R.id.cancelupdate);
-			cancelUpdate.setOnClickListener(DialogUtils.closeNavigator(this));
 			Button saveNoteButton = (Button) findViewById(R.id.UpdateNote);
 
 			saveNoteButton.setOnClickListener(updateNoteListener);
@@ -226,6 +223,9 @@ public class AddNotes extends Activity implements LocationFixedListener {
 		if (currentNoteId == 0) {
 			contentField.requestFocus();
 		}
+
+		ActionBar actionbar = getActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -245,6 +245,9 @@ public class AddNotes extends Activity implements LocationFixedListener {
 							"GiNote 2.13\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
 							this);
 			return true;
+		case android.R.id.home:
+			finish();
+			break;
 		case R.id.itemOptions:
 			DialogUtils.switchActivity(Options.class, this);
 			break;
