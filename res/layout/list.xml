@@ -3,9 +3,16 @@
 	xmlns:app="http://schemas.android.com/apk/res/com.dayosoft.quicknotes"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
-	<Button android:text="Add Note" android:id="@+id/addButton"
-		android:drawableLeft="@drawable/add" android:textSize="20dip"
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
+
+	<Button
+	    android:id="@+id/addButton"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="3dip"
+	    android:drawableLeft="@drawable/add"
+	    android:text="Add Note"
+	    android:textSize="20dip" >
+
 	</Button>
 
 	<ListView

@@ -8,6 +8,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -21,8 +23,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
@@ -170,13 +175,74 @@ public class DialogUtils {
 		});
 	}
 
-	public static boolean hasINet() {
-		if (ConnectivityManager
-				.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE)
-				|| ConnectivityManager
-						.isNetworkTypeValid(ConnectivityManager.TYPE_WIFI))
-			return true;
-		return false;
+	public static boolean hasINet(Context context) {
+		boolean haveConnectedWifi = false;
+		boolean haveConnectedMobile = false;
+
+		ConnectivityManager cm = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+		for (NetworkInfo ni : netInfo) {
+			if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+				if (ni.isConnected())
+					haveConnectedWifi = true;
+			if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+				if (ni.isConnected())
+					haveConnectedMobile = true;
+		}
+		return haveConnectedWifi || haveConnectedMobile;
+	}
+
+	public static void isNetworkAvailable(final Context context,
+			final OnInternetReadyListener handler, final int timeout) {
+		// ask fo message '0' (not connected) or '1' (connected) on 'handler'
+		// the answer must be send before before within the 'timeout' (in
+		// milliseconds)
+		Thread thread = new Thread() {
+			public boolean responded = false;
+
+			@Override
+			public void run() {
+				// set 'responded' to TRUE if is able to connect with google
+				// mobile (responds fast)
+				Looper.prepare();
+				if (hasINet(context)) {
+					new Thread() {
+						@Override
+						public void run() {
+							HttpGet requestForTest = new HttpGet(
+									"http://m.google.com");
+							try {
+								new DefaultHttpClient().execute(requestForTest); // can
+								responded = true;
+							} catch (Exception e) {
+							}
+						}
+					}.start();
+					try {
+						int waited = 0;
+						while (!responded && (waited < timeout)) {
+							sleep(100);
+							if (!responded) {
+								waited += 100;
+							}
+						}
+					} catch (InterruptedException e) {
+					} // do nothing
+
+					finally {
+						if (!responded) {
+							handler.onInternetReady(false);
+						} else {
+							handler.onInternetReady(true);
+						}
+					}
+				} else {
+					handler.onInternetReady(false);
+				}
+			}
+		};
+		thread.start();
 	}
 
 	public static File convertImageUriToFile(Uri imageUri, Activity activity) {
@@ -204,30 +270,30 @@ public class DialogUtils {
 			}
 		}
 	}
-	
-	public static Document getDomElement(String xml){
-        Document doc = null;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
- 
-            DocumentBuilder db = dbf.newDocumentBuilder();
- 
-            InputSource is = new InputSource();
-                is.setCharacterStream(new StringReader(xml));
-                doc = db.parse(is); 
- 
-            } catch (ParserConfigurationException e) {
-                Log.e("Error: ", e.getMessage());
-                return null;
-            } catch (SAXException e) {
-                Log.e("Error: ", e.getMessage());
-                return null;
-            } catch (IOException e) {
-                Log.e("Error: ", e.getMessage());
-                return null;
-            }
-                // return DOM
-            return doc;
-    }
+
+	public static Document getDomElement(String xml) {
+		Document doc = null;
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+
+			DocumentBuilder db = dbf.newDocumentBuilder();
+
+			InputSource is = new InputSource();
+			is.setCharacterStream(new StringReader(xml));
+			doc = db.parse(is);
+
+		} catch (ParserConfigurationException e) {
+			Log.e("Error: ", e.getMessage());
+			return null;
+		} catch (SAXException e) {
+			Log.e("Error: ", e.getMessage());
+			return null;
+		} catch (IOException e) {
+			Log.e("Error: ", e.getMessage());
+			return null;
+		}
+		// return DOM
+		return doc;
+	}
 
 }

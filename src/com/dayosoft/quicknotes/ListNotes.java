@@ -10,6 +10,7 @@ import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.DictionaryOpenHelper;
 import com.dayosoft.utils.GoogleFTSyncer;
 import com.dayosoft.utils.ImageDownloadTask;
+import com.dayosoft.utils.OnInternetReadyListener;
 import com.dayosoft.utils.TimeUtils;
 
 import android.app.Activity;
@@ -37,6 +38,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ListNotes extends Activity {
 	TableLayout notesview;
@@ -94,11 +96,9 @@ public class ListNotes extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mainmenu, menu);
-		
+
 		if (getTableName() != null) {
 			MenuItem menuitem = menu.findItem(R.id.itemSync);
-			menuitem.setEnabled(true);
-			menuitem.setVisible(true);
 		}
 		return true;
 	}
@@ -128,6 +128,10 @@ public class ListNotes extends Activity {
 					ListNotes.NOTE_UPDATED);
 		}
 
+		if (requestRefresh()) {
+			GoogleFTUpdater updater = new GoogleFTUpdater(this);
+			updater.execute();
+		}
 	}
 
 	@Override
@@ -167,8 +171,23 @@ public class ListNotes extends Activity {
 			break;
 		case R.id.itemSync:
 			View menuitem = (View) findViewById(R.id.itemSync);
-			GoogleFTSyncer syncer = new GoogleFTSyncer(this, menuitem);
-			syncer.execute();
+			if (getTableName() == null) {
+				Toast.makeText(
+						this,
+						"Fusion Tables needs to be setup, visit the options menu to do so.",
+						Toast.LENGTH_LONG).show();
+			} else {
+				if (DialogUtils.hasINet(this)) {
+					GoogleFTSyncer syncer = new GoogleFTSyncer(ListNotes.this,
+							menuitem);
+					syncer.execute();
+				} else {
+					Toast.makeText(
+							this,
+							"Unable to sync. Please ensure your device is connected to the internet",
+							Toast.LENGTH_LONG).show();
+				}
+			}
 			break;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -187,6 +206,10 @@ public class ListNotes extends Activity {
 
 	private String getTableName() {
 		return settings.getString("sync_table", null);
+	}
+
+	private boolean requestRefresh() {
+		return settings.getBoolean("request_sync", false);
 	}
 
 }

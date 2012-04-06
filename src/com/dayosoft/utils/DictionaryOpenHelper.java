@@ -18,12 +18,14 @@ import com.dayosoft.quicknotes.NoteSyncer;
 import android.app.backup.BackupManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class DictionaryOpenHelper extends SQLiteOpenHelper {
+public class DictionaryOpenHelper extends SQLiteOpenHelper implements
+		OnInternetReadyListener {
 
 	private static final int DATABASE_VERSION = 8;
 	private static final String DATABASE_NAME = "QUICKNOTES";
@@ -49,9 +51,8 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public void onDataChanged(boolean ft_sync) {
-		if (DialogUtils.hasINet() && ft_sync) {
-			GoogleFTUpdater updater = new GoogleFTUpdater(context);
-			updater.execute();
+		if (ft_sync) {
+			DialogUtils.isNetworkAvailable(context, this, 1000);
 		}
 	}
 
@@ -74,11 +75,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 
 	public Vector<Integer> getNoteIds(String query) {
 		Vector<Integer> results = new Vector<Integer>();
-		
 
-		String wheres[] = {"title LIKE '%" + query + "%'"};
-		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
-		
+		String wheres[] = { "title LIKE '%" + query + "%'" };
+		String whereClause = query != null ? getWhereClause(wheres)
+				: getWhereClause(null);
+
 		String columns[] = { "id" };
 		Log.d(this.getClass().toString(), "Reading note ids");
 		Cursor notelist = getReadableDatabase().query("notes", columns,
@@ -93,8 +94,9 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	public int countNotes(String query) {
-		String wheres[] = {"title LIKE '%" + query + "%'"};
-		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
+		String wheres[] = { "title LIKE '%" + query + "%'" };
+		String whereClause = query != null ? getWhereClause(wheres)
+				: getWhereClause(null);
 		String columns[] = { "count(id) as total" };
 		Cursor notelist = getReadableDatabase().query("notes", columns,
 				whereClause, null, null, null, "date_created DESC LIMIT 100");
@@ -111,13 +113,16 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				"SELECT COUNT(*) AS COUNT FROM " + table + " WHERE "
 						+ whereClause, null);
 		count_raw.moveToFirst();
-		return count_raw.getInt(0);
+		int count = count_raw.getInt(0);
+		count_raw.close();
+		return count;
 	}
 
 	public void listUnsyncedNotes(NoteSyncer sync) {
 
 		String columns[] = { "id", "title", "content", "date_created",
-				"date_updated", "uid", "sync_ts","latitude","longitude","delete_pending"};
+				"date_updated", "uid", "sync_ts", "latitude", "longitude",
+				"delete_pending" };
 
 		String whereClause = "SYNC_TS = 0 OR FT_DIRTY = 1";
 		int total_records = count("NOTES", whereClause);
@@ -181,24 +186,25 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	}
 
 	private String getWhereClause(String wheres[]) {
-		ArrayList <String>whereClauses = new ArrayList<String>();
+		ArrayList<String> whereClauses = new ArrayList<String>();
 		whereClauses.add("DELETE_PENDING = 0");
 		if (wheres != null) {
-			for(String where : wheres) {
+			for (String where : wheres) {
 				whereClauses.add(where);
 			}
 		}
 		return StringUtils.join(whereClauses, " AND ");
 	}
-	
+
 	public List<Note> listNotes(String query) {
 		Vector<Note> returnList = new Vector<Note>();
 
 		String columns[] = { "id", "title", "content", "date_created" };
 
-		String wheres[] = {"title LIKE '%" + query + "%'"};
-		String whereClause = query!=null ? getWhereClause(wheres) : getWhereClause(null);
-		
+		String wheres[] = { "title LIKE '%" + query + "%'" };
+		String whereClause = query != null ? getWhereClause(wheres)
+				: getWhereClause(null);
+
 		Cursor notelist = getReadableDatabase().query("notes", columns,
 				whereClause, null, null, null, "date_created DESC LIMIT 1000");
 		if (notelist.moveToFirst()) {
@@ -275,7 +281,8 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				null, null, "date_created DESC LIMIT 100");
 		Log.d(this.getClass().toString(), "loading object uid = " + uid);
 		if (notelist.moveToFirst()) {
-			Log.d(this.getClass().toString(), "object uid = " + uid + " loaded.");
+			Log.d(this.getClass().toString(), "object uid = " + uid
+					+ " loaded.");
 			Note note = new Note();
 			note.setId(notelist.getInt(0));
 			note.setTitle(notelist.getString(1));
@@ -318,7 +325,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 			note.setLatitude(notelist.getDouble(7));
 			note.setLongitude(notelist.getDouble(8));
 			note.setFt_dirty(notelist.getInt(9));
-			
+
 			try {
 				note.setDate_created(dateformat.parse(notelist.getString(4)));
 			} catch (ParseException e) {
@@ -337,7 +344,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 	public void touch(int id) {
 		touch(id, System.currentTimeMillis());
 	}
-	
+
 	public void touchForDelete(int id) {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("UPDATE NOTES SET DELETE_PENDING = 1, FT_DIRTY = 1"
@@ -345,7 +352,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		db.close();
 		onDataChanged();
 	}
-	
+
 	public void touch(int id, long ts) {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("UPDATE NOTES SET FT_DIRTY = 0, SYNC_TS=" + ts
@@ -366,11 +373,11 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		ContentValues newValues = new ContentValues();
 		if (note.getId() == 0) {
 			newRecord = true;
-			Log.d(this.getClass().toString(),"Persist new record");
+			Log.d(this.getClass().toString(), "Persist new record");
 		} else {
 			row_id = note.getId();
 			newValues.put("ID", row_id);
-			Log.d(this.getClass().toString(),"update record");
+			Log.d(this.getClass().toString(), "update record");
 		}
 
 		if (note.getTitle() == null || note.getTitle().trim().equals("")) {
@@ -388,7 +395,7 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 		newValues.put("CONTENT", note.getContent());
 		newValues.put("LATITUDE", note.getLatitude());
 		newValues.put("LONGITUDE", note.getLongitude());
-		
+
 		SimpleDateFormat dateformat = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss");
 		if (note.getDate_created() == null)
@@ -484,5 +491,19 @@ public class DictionaryOpenHelper extends SQLiteOpenHelper {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onInternetReady(boolean available) {
+		if (available) {
+			GoogleFTUpdater updater = new GoogleFTUpdater(context);
+			updater.execute();
+		} else {
+			Editor editor = context.getSharedPreferences("ginote_settings",
+					Context.MODE_PRIVATE).edit();
+			editor.putBoolean("request_sync", true);
+			editor.apply();
+		}
+
 	}
 }

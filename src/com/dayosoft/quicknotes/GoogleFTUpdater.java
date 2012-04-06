@@ -9,13 +9,17 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.DictionaryOpenHelper;
 import com.dayosoft.utils.FTQueryCompleteListener;
 import com.dayosoft.utils.FusionTableService;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -49,9 +53,18 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 	@Override
 	protected Object doInBackground(Object... params) {
 		if (!this.getTableId().equalsIgnoreCase("")) {
-			helper.listUnsyncedNotes(this);
+			if (DialogUtils.hasINet(context)) {
+				startSync();
+				setRequestRefresh(false);
+			} else {
+				setRequestRefresh(true);
+			}
 		}
 		return null;
+	}
+	
+	public void startSync() {
+		helper.listUnsyncedNotes(GoogleFTUpdater.this);
 	}
 
 	@Override
@@ -78,7 +91,7 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 		}
 		ArrayList<HashMap<String, String>> result = service.create_sync(
 				queryBuffer.toString(), true);
-		if (result.size() == notes.length) {
+		if (result!=null && result.size() == notes.length) {
 			for (Note note : notes) {
 				helper.touch(note.id, sync_ts);
 			}
@@ -208,4 +221,9 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 		return settings.getString("sync_table_id", "");
 	}
 
+	private void setRequestRefresh(boolean value) {
+		Editor editor = settings.edit();
+		editor.putBoolean("request_sync", value);
+		editor.apply();
+	}
 }

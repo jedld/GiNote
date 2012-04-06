@@ -53,13 +53,12 @@
 	        android:editable="false"
 	        android:ems="10" />
 
-	    <Button
+	    <ImageButton
 	        android:id="@+id/buttonSync"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="0"
-	        android:enabled="false"
-	        android:text="Sync" />
+	        android:src="@drawable/cloud" />
 
 	</LinearLayout>
 		

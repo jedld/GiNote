@@ -8,6 +8,7 @@ import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.FTQueryCompleteListener;
 import com.dayosoft.utils.FusionTableService;
 import com.dayosoft.utils.GoogleFTSyncer;
+import com.dayosoft.utils.OnInternetReadyListener;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
 
@@ -90,8 +91,21 @@ public class Options extends Activity implements OnClickListener,
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.buttonSync:
-			GoogleFTSyncer syncer = new GoogleFTSyncer(this, syncFT);
-			syncer.execute();
+			DialogUtils.isNetworkAvailable(this, new OnInternetReadyListener() {
+				@Override
+				public void onInternetReady(boolean available) {
+					if (available) {
+						GoogleFTSyncer syncer = new GoogleFTSyncer(
+								Options.this, syncFT);
+						syncer.execute();
+					} else {
+						Toast.makeText(
+								Options.this,
+								"Unable to sync. Your device must be connected to the internet",
+								Toast.LENGTH_SHORT).show();
+					}
+				}
+			}, 1000);
 			break;
 		case R.id.buttonFusionTableSync:
 			accountManager.manager.getAuthTokenByFeatures(
@@ -229,16 +243,21 @@ public class Options extends Activity implements OnClickListener,
 												types.get("NAME"),
 												types.get("TYPE"));
 									}
-									
-									//make sure target table is structurally correct
+
+									// make sure target table is structurally
+									// correct
 									if (updater
 											.isValidSchema(targetTableSchema)) {
 										setTableName(items[item_index]);
 										setTableId(table_ids[item_index]);
 									} else {
-										AlertDialog.Builder errorAlert = new AlertDialog.Builder(Options.this);
-										errorAlert.setMessage("Sorry the table " + items[item_index] + " does not have the correct table structure for GiNote FT. " +
-												"Choose \"Create New Table\" to create a new one or choose another table.");
+										AlertDialog.Builder errorAlert = new AlertDialog.Builder(
+												Options.this);
+										errorAlert
+												.setMessage("Sorry the table "
+														+ items[item_index]
+														+ " does not have the correct table structure for GiNote FT. "
+														+ "Choose \"Create New Table\" to create a new one or choose another table.");
 										AlertDialog alert = errorAlert.create();
 										alert.show();
 									}
@@ -270,4 +289,5 @@ public class Options extends Activity implements OnClickListener,
 	private String getTableName() {
 		return settings.getString("sync_table", "");
 	}
+
 }

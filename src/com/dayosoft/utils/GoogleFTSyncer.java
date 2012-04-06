@@ -11,12 +11,14 @@ import org.w3c.dom.Document;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.dayosoft.quicknotes.GoogleFTUpdater;
 import com.dayosoft.quicknotes.ListNotes;
 import com.dayosoft.quicknotes.Note;
 import com.dayosoft.quicknotes.NoteMeta;
@@ -71,6 +73,11 @@ public class GoogleFTSyncer extends AsyncTask {
 	@Override
 	protected Object doInBackground(Object... params) {
 		if (!this.getTableId().equalsIgnoreCase("")) {
+			
+			GoogleFTUpdater updater = new GoogleFTUpdater(context);
+			updater.startSync();
+			setRequestRefresh(false);
+			
 			ArrayList<HashMap<String, String>> result = service
 					.query_sync(
 							"SELECT ROWID,UID,TITLE,CONTENT,POSITION,DATE_CREATED,DATE_UPDATED,SYNC_TS,IS_DELETED FROM "
@@ -152,4 +159,9 @@ public class GoogleFTSyncer extends AsyncTask {
 		return settings.getString("sync_table_id", "");
 	}
 
+	private void setRequestRefresh(boolean value) {
+		Editor editor = settings.edit();
+		editor.putBoolean("request_sync", value);
+		editor.apply();
+	}
 }
