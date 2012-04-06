@@ -1,4 +1,4 @@
-package com.dayosoft.quicknotes;
+package com.dayosoft.ginotefusion;
 
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.SharedPreferencesBackupHelper;

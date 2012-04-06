@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, ListNotes!</string>
-    <string name="app_name">GiNote</string>
+    <string name="app_name">GiNote Fusion</string>
     <string name="auto_backup_options">Automatic Backup Options</string>
     <string name="fusion_table_sync">Setup Google Fusion Table Sync</string>
 </resources>

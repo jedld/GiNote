@@ -10,10 +10,10 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.dayosoft.quicknotes.GoogleFTUpdater;
-import com.dayosoft.quicknotes.Note;
-import com.dayosoft.quicknotes.NoteMeta;
-import com.dayosoft.quicknotes.NoteSyncer;
+import com.dayosoft.ginotefusion.GoogleFTUpdater;
+import com.dayosoft.ginotefusion.Note;
+import com.dayosoft.ginotefusion.NoteMeta;
+import com.dayosoft.ginotefusion.NoteSyncer;
 
 import android.app.backup.BackupManager;
 import android.content.ContentValues;

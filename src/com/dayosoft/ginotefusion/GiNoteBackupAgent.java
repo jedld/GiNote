@@ -1,4 +1,4 @@
-package com.dayosoft.quicknotes;
+package com.dayosoft.ginotefusion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

@@ -1,4 +1,4 @@
-package com.dayosoft.quicknotes;
+package com.dayosoft.ginotefusion;
 
 public interface NoteSyncer {
 

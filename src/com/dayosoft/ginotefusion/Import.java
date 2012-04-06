@@ -1,4 +1,4 @@
-package com.dayosoft.quicknotes;
+package com.dayosoft.ginotefusion;
 
 import java.io.File;
 import java.io.FileReader;

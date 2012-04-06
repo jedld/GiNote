@@ -18,10 +18,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.dayosoft.quicknotes.GoogleFTUpdater;
-import com.dayosoft.quicknotes.ListNotes;
-import com.dayosoft.quicknotes.Note;
-import com.dayosoft.quicknotes.NoteMeta;
+import com.dayosoft.ginotefusion.GoogleFTUpdater;
+import com.dayosoft.ginotefusion.ListNotes;
+import com.dayosoft.ginotefusion.Note;
+import com.dayosoft.ginotefusion.NoteMeta;
 
 public class GoogleFTSyncer extends AsyncTask {
 	SharedPreferences settings;

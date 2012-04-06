@@ -1,4 +1,4 @@
-package com.dayosoft.quicknotes;
+package com.dayosoft.ginotefusion;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 class ClientCredentials {
@@ -50,7 +51,7 @@ public class Options extends Activity implements OnClickListener,
 	EditText suffixField, tableNameField;
 	GoogleAccountManager accountManager;
 	SharedPreferences settings;
-	Button syncFT;
+	ImageButton syncFT;
 	private static final String TAG = "Ginote";
 	String[] items = {}, table_ids = {};
 	GoogleCredential credential = new GoogleCredential();
@@ -71,7 +72,7 @@ public class Options extends Activity implements OnClickListener,
 		settings = getSharedPreferences("ginote_settings", MODE_PRIVATE);
 		CheckBox useGPS = (CheckBox) findViewById(R.id.UseGPS);
 		CheckBox autoAddNote = (CheckBox) findViewById(R.id.autoAddNote);
-		syncFT = (Button) findViewById(R.id.buttonSync);
+		syncFT = (ImageButton) findViewById(R.id.buttonSync);
 		if (getAuthToken() != null) {
 			syncFT.setEnabled(true);
 		}
@@ -91,21 +92,23 @@ public class Options extends Activity implements OnClickListener,
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.buttonSync:
-			DialogUtils.isNetworkAvailable(this, new OnInternetReadyListener() {
-				@Override
-				public void onInternetReady(boolean available) {
-					if (available) {
-						GoogleFTSyncer syncer = new GoogleFTSyncer(
-								Options.this, syncFT);
-						syncer.execute();
-					} else {
-						Toast.makeText(
-								Options.this,
-								"Unable to sync. Your device must be connected to the internet",
-								Toast.LENGTH_SHORT).show();
-					}
+			if (getTableName() == null) {
+				Toast.makeText(
+						this,
+						"Fusion Tables needs to be setup, visit the options menu to do so.",
+						Toast.LENGTH_LONG).show();
+			} else {
+				if (DialogUtils.hasINet(this)) {
+					GoogleFTSyncer syncer = new GoogleFTSyncer(Options.this,
+							syncFT);
+					syncer.execute();
+				} else {
+					Toast.makeText(
+							this,
+							"Unable to sync. Please ensure your device is connected to the internet",
+							Toast.LENGTH_LONG).show();
 				}
-			}, 1000);
+			}
 			break;
 		case R.id.buttonFusionTableSync:
 			accountManager.manager.getAuthTokenByFeatures(
