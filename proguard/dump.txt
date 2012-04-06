@@ -17800,7 +17800,7 @@ _____________________________________________________________________
 
 Interfaces (count = 0):
 
-Constant Pool (count = 346):
+Constant Pool (count = 345):
   - String []
   - String [ WHERE DATE_UPDATED >= ]
   - String [CONTENT]
@@ -17902,7 +17902,7 @@ Constant Pool (count = 346):
   - Methodref [com/dayosoft/ginotefusion/l.i ()Ljava/lang/String;]
   - Methodref [com/dayosoft/ginotefusion/l.k ()Ljava/lang/Long;]
   - Methodref [com/dayosoft/ginotefusion/l.l ()I]
-  - Methodref [com/dayosoft/ginotefusion/m.b ()V]
+  - Methodref [com/dayosoft/ginotefusion/m.a ()V]
   - Methodref [com/dayosoft/ginotefusion/o.<init> ()V]
   - Methodref [com/dayosoft/ginotefusion/o.a (I)V]
   - Methodref [com/dayosoft/ginotefusion/o.a (Ljava/lang/String;)V]
@@ -17953,7 +17953,6 @@ Constant Pool (count = 346):
   - NameAndType [append (Ljava/lang/String;)Ljava/lang/StringBuilder;]
   - NameAndType [apply ()V]
   - NameAndType [b ()J]
-  - NameAndType [b ()V]
   - NameAndType [b (D)V]
   - NameAndType [b (Ljava/lang/String;)V]
   - NameAndType [b (Ljava/lang/String;Z)Ljava/util/ArrayList;]
@@ -18303,7 +18302,7 @@ Methods (count = 5):
       [34] getstatic #59
         - Fieldref [com/dayosoft/ginotefusion/ListNotes.b Lcom/dayosoft/ginotefusion/m;]
       [37] invokevirtual #102
-        - Methodref [com/dayosoft/ginotefusion/m.b ()V]
+        - Methodref [com/dayosoft/ginotefusion/m.a ()V]
       [40] return
       Code attribute exceptions (count = 0):
       Code attribute attributes (attribute count = 1):

@@ -17,12 +17,14 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -86,6 +88,9 @@ public class Options extends Activity implements OnClickListener,
 		setupGoogleAccount.setOnClickListener(this);
 		syncFT.setOnClickListener(this);
 		accountManager = new GoogleAccountManager(this);
+		
+		ActionBar actionbar = getActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -272,6 +277,16 @@ public class Options extends Activity implements OnClickListener,
 		});
 		AlertDialog alert = builder.create();
 		alert.show();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		}
+		return false;
 	}
 
 	private void setTableId(String table_id) {

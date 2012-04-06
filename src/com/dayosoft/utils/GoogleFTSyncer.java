@@ -67,7 +67,7 @@ public class GoogleFTSyncer extends AsyncTask {
 		if (progress_dialog != null) {
 			progress_dialog.dismiss();
 		}
-		ListNotes.listAdapter.notifyInvalidate();
+		ListNotes.listAdapter.notifyChange();
 	}
 
 	@Override

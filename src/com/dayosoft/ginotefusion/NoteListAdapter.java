@@ -104,6 +104,7 @@ public class NoteListAdapter implements ListAdapter {
 		TextView text = (TextView) view.findViewById(R.id.title);
 		TextView datetime = (TextView) view.findViewById(R.id.datetime);
 		TextView gpslocation = (TextView) view.findViewById(R.id.gpslocation);
+		ImageView syncIndicator = (ImageView) view.findViewById(R.id.imageSyncIndicator);
 		TextView todayIndicator = (TextView) view
 				.findViewById(R.id.todayIndicator);
 		TextView yesterdayIndicator = (TextView) view
@@ -174,6 +175,13 @@ public class NoteListAdapter implements ListAdapter {
 			gpslocation.setVisibility(View.GONE);
 		}
 
+		
+		if (note.getSync_ts() > 0 && note.getFt_dirty() == 0) {
+			syncIndicator.setImageResource(R.drawable.synced);
+		} else {
+			syncIndicator.setImageResource(R.drawable.unsynced);
+		}
+		
 		List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
 		if (imagelist.size() > 0) {
 			imagelayout.setVisibility(View.VISIBLE);

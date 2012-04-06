@@ -6,12 +6,14 @@ import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.DictionaryOpenHelper;
 import com.dayosoft.utils.ImageDownloadTask;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,13 +35,15 @@ public class Picture extends Activity {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-		Button backButton = (Button) findViewById(R.id.backButton);
 		LinearLayout layout = (LinearLayout) findViewById(R.id.images);
-		backButton.setOnClickListener(DialogUtils.closeNavigator(this));
 
 		helper = new DictionaryOpenHelper(this);
 		note = helper.load(note_id);
-		int height = dm.heightPixels - backButton.getHeight() - 90;
+
+		ActionBar actionbar = getActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+
+		int height = dm.heightPixels - actionbar.getHeight() - 90;
 
 		List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
 
@@ -68,4 +72,13 @@ public class Picture extends Activity {
 
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		}
+		return false;
+	}
 }

@@ -10,12 +10,15 @@
         android:id="@+id/todayIndicator"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:background="#FFFFFF"
+        android:gravity="center_horizontal"
         android:paddingLeft="8dip"
         android:text="Today"
         android:textColor="#000000"
-        android:textSize="12dip"
+        android:textSize="14dip"
         android:visibility="gone" >
+
     </TextView>
 
     <TextView
@@ -25,8 +28,9 @@
         android:background="#FFFFFF"
         android:paddingLeft="8dip"
         android:text="Yesterday"
+        android:gravity="center_horizontal"
         android:textColor="#000000"
-        android:textSize="12dip"
+        android:textSize="14dip"
         android:visibility="gone" >
     </TextView>
 
@@ -35,11 +39,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
+        android:gravity="center_horizontal"
         android:paddingLeft="8dip"
         android:text="A few days ago"
         android:textColor="#000000"
-        android:textSize="12dip"
+        android:textSize="14dip"
         android:visibility="gone" >
+
     </TextView>
 
     <TextView
@@ -49,13 +55,25 @@
         android:paddingLeft="5dip"
         android:textSize="25dip" >
     </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/imageSyncIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/unsynced" />
+
         <TextView
             android:id="@+id/datetime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="2dip"
-            android:textSize="12dip" >
-        </TextView>
+            android:textSize="12dip" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/gpslocation"
