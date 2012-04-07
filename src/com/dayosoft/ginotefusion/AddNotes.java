@@ -9,13 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.Vector;
-
-import com.dayosoft.utils.DialogUtils;
-import com.dayosoft.utils.DictionaryOpenHelper;
-import com.dayosoft.utils.GoogleMapsLocation;
-import com.dayosoft.utils.LocationFixedListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -44,6 +38,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.DictionaryOpenHelper;
+import com.dayosoft.utils.GoogleMapsLocation;
+import com.dayosoft.utils.LocationFixedListener;
 
 /**
  * @author Joseph Emmanuel Dayo
@@ -264,6 +263,10 @@ public class AddNotes extends Activity implements LocationFixedListener {
 					android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 			startActivityForResult(i, ACTION_PICK_IMAGE);
 			break;
+		case R.id.itemBarcode:
+			IntentIntegrator integrator = new IntentIntegrator(this);
+			integrator.initiateScan();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -375,7 +378,15 @@ public class AddNotes extends Activity implements LocationFixedListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == ACTION_PICK_IMAGE) {
+		if (requestCode == IntentIntegrator.REQUEST_CODE) {
+			IntentResult scanResult = IntentIntegrator.parseActivityResult(
+					requestCode, resultCode, data);
+			if (scanResult != null) {
+				contentField.setText(contentField.getText().toString()
+						+ scanResult.getContents());
+				titleField.requestFocus();
+			}
+		} else if (requestCode == ACTION_PICK_IMAGE) {
 			if (resultCode == RESULT_OK) {
 				Uri selectedImage = data.getData();
 				String[] filePathColumn = { MediaColumns.DATA };

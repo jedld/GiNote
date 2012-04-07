@@ -26,7 +26,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.Looper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;

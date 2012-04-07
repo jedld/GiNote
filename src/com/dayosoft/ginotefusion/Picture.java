@@ -2,10 +2,6 @@ package com.dayosoft.ginotefusion;
 
 import java.util.List;
 
-import com.dayosoft.utils.DialogUtils;
-import com.dayosoft.utils.DictionaryOpenHelper;
-import com.dayosoft.utils.ImageDownloadTask;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -15,9 +11,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.dayosoft.utils.DictionaryOpenHelper;
+import com.dayosoft.utils.ImageDownloadTask;
 
 public class Picture extends Activity {
 

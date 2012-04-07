@@ -2,26 +2,21 @@ package com.dayosoft.ginotefusion;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.dayosoft.utils.DialogUtils;
-import com.dayosoft.utils.DictionaryOpenHelper;
-import com.dayosoft.utils.FTQueryCompleteListener;
-import com.dayosoft.utils.FusionTableService;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.widget.Toast;
+
+import com.dayosoft.utils.DialogUtils;
+import com.dayosoft.utils.DictionaryOpenHelper;
+import com.dayosoft.utils.FTQueryCompleteListener;
+import com.dayosoft.utils.FusionTableService;
 
 public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 	SharedPreferences settings;
@@ -63,6 +58,13 @@ public class GoogleFTUpdater extends AsyncTask implements NoteSyncer {
 		return null;
 	}
 	
+	@Override
+	protected void onPostExecute(Object result) {
+		// TODO Auto-generated method stub
+		super.onPostExecute(result);
+		ListNotes.listAdapter.notifyChange();
+	}
+
 	public void startSync() {
 		helper.listUnsyncedNotes(GoogleFTUpdater.this);
 	}
