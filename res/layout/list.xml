@@ -1,34 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res/com.dayosoft.ginotefusion"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+    xmlns:app="http://schemas.android.com/apk/res/com.dayosoft.ginotefusion"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-	<Button
-	    android:id="@+id/addButton"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_marginTop="3dip"
-	    android:drawableLeft="@drawable/add"
-	    android:text="Add Note"
-	    android:textSize="20dip" >
+    <RelativeLayout
+        android:id="@+id/actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-	</Button>
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toRightOf="@id/home"
+            android:src="@drawable/copy" />
 
-	<ListView
-	    android:id="@+id/list"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="2"
-	    android:divider="#ECF0DA"
-	    android:dividerHeight="3px"
-	    android:orientation="vertical"
-	    android:paddingLeft="4dip"
-	    android:paddingRight="4dip" >
+        <ImageView
+            android:id="@+id/itemSync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dip"
+            android:src="@drawable/cloud" />
 
-	</ListView>
-	<!-- com.admob.android.ads.AdView android:id="@+id/ad" android:layout_width="fill_parent"
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageView1"
+            android:text="GiNote Fusion"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
+        android:drawableLeft="@drawable/add"
+        android:text="Add Note"
+        android:textSize="20dip" >
+    </Button>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="2"
+        android:divider="#ECF0DA"
+        android:dividerHeight="3px"
+        android:orientation="vertical"
+        android:paddingLeft="4dip"
+        android:paddingRight="4dip" >
+    </ListView>
+    <!--
+         com.admob.android.ads.AdView android:id="@+id/ad" android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 		app:backgroundColor="#000000" app:primaryTextColor="#FFFFFF"
-		app:secondaryTextColor="#CCCCCC" app:keywords="ginote note taking" /-->
+		app:secondaryTextColor="#CCCCCC" app:keywords="ginote note taking" /
+    -->
+
 </LinearLayout>

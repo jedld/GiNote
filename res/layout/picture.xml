@@ -3,6 +3,26 @@
 	xmlns:app="http://schemas.android.com/apk/res/com.dayosoft.ginotefusion"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
+
+	    <RelativeLayout
+	        android:id="@+id/actionbar"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/back" />
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toRightOf="@id/home"
+            android:src="@drawable/copy" />
+
+    </RelativeLayout>
 	<HorizontalScrollView android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
 		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

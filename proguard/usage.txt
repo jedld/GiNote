@@ -116,13 +116,41 @@ com.admob.android.ads.z$a
 com.dayosoft.ginotefusion.AddNotes:
     static final int ACTION_PICK_IMAGE
     static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
-    311:319:public boolean hasImageCaptureBug()
+    296:304:public boolean hasImageCaptureBug()
 com.dayosoft.ginotefusion.BuildConfig
 com.dayosoft.ginotefusion.ClientCredentials
 com.dayosoft.ginotefusion.GoogleFTUpdater:
     static final java.lang.String PREF_AUTH_TOKEN
-    217:217:private java.lang.String getTableName()
+    219:219:private java.lang.String getTableName()
 com.dayosoft.ginotefusion.Import
+com.dayosoft.ginotefusion.IntentIntegrator:
+    public static final int REQUEST_CODE
+    public static final java.lang.String DEFAULT_TITLE
+    public static final java.lang.String DEFAULT_MESSAGE
+    public static final java.lang.String DEFAULT_YES
+    public static final java.lang.String DEFAULT_NO
+    private static final java.lang.String BS_PACKAGE
+    142:142:public java.lang.String getTitle()
+    146:147:public void setTitle(java.lang.String)
+    150:151:public void setTitleByID(int)
+    154:154:public java.lang.String getMessage()
+    158:159:public void setMessage(java.lang.String)
+    162:163:public void setMessageByID(int)
+    166:166:public java.lang.String getButtonYes()
+    170:171:public void setButtonYes(java.lang.String)
+    174:175:public void setButtonYesByID(int)
+    178:178:public java.lang.String getButtonNo()
+    182:183:public void setButtonNo(java.lang.String)
+    186:187:public void setButtonNoByID(int)
+    190:190:public java.util.Collection getTargetApplications()
+    194:195:public void setTargetApplications(java.util.Collection)
+    198:199:public void setSingleTargetApplication(java.lang.String)
+    330:344:public void shareText(java.lang.CharSequence)
+com.dayosoft.ginotefusion.IntentResult:
+    60:60:public java.lang.String getFormatName()
+    68:68:public byte[] getRawBytes()
+    76:76:public java.lang.Integer getOrientation()
+    84:84:public java.lang.String getErrorCorrectionLevel()
 com.dayosoft.ginotefusion.ListNotes:
     android.widget.TableLayout notesview
     public static final int NOTE_ADDED
@@ -150,12 +178,12 @@ com.dayosoft.ginotefusion.R$string
 com.dayosoft.ginotefusion.R$styleable
 com.dayosoft.ginotefusion.R$xml
 com.dayosoft.utils.ActivityNavigator:
-    55:58:public ActivityNavigator(android.app.Activity,java.lang.Class)
+    54:57:public ActivityNavigator(android.app.Activity,java.lang.Class)
 com.dayosoft.utils.ClientCredentials
 com.dayosoft.utils.DialogUtils:
-    73:73:public DialogUtils()
-    122:123:public static android.view.View$OnClickListener setNavigator(java.lang.Class,android.app.Activity)
-    153:160:public static void linkToContextMenu(android.app.Activity,android.widget.Button)
+    72:72:public DialogUtils()
+    121:122:public static android.view.View$OnClickListener setNavigator(java.lang.Class,android.app.Activity)
+    152:159:public static void linkToContextMenu(android.app.Activity,android.widget.Button)
 com.dayosoft.utils.DialogUtils$4
 com.dayosoft.utils.DictionaryOpenHelper:
     private static final int DATABASE_VERSION

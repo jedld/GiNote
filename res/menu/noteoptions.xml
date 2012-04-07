@@ -3,9 +3,9 @@
 	<item android:title="About" android:titleCondensed="About"
 		android:id="@+id/about" android:icon="@drawable/info"></item>
 	<item android:id="@+id/itemOptions" android:title="Options"
-		android:icon="@drawable/options" android:showAsAction="never"></item>
-	<item android:id="@+id/itemLockGPS" android:showAsAction="ifRoom" android:title="Tag GPS" android:icon="@drawable/gps"></item>
-	<item android:id="@+id/itemCamera" android:showAsAction="always" android:title="Camera" android:icon="@drawable/camera"></item>
-	<item android:id="@+id/itemGallery" android:showAsAction="ifRoom" android:title="Gallery" android:icon="@drawable/picture"></item>
-	<item android:id="@+id/itemBarcode" android:title="Barcode" android:showAsAction="always" android:titleCondensed="Barcode" android:icon="@drawable/barcode"></item>
+		android:icon="@drawable/options" ></item>
+	<item android:id="@+id/itemLockGPS"  android:title="Tag GPS" android:icon="@drawable/gps"></item>
+	<item android:id="@+id/itemCamera"  android:title="Camera" android:icon="@drawable/camera"></item>
+	<item android:id="@+id/itemGallery"  android:title="Gallery" android:icon="@drawable/picture"></item>
+	<item android:id="@+id/itemBarcode" android:title="Barcode" android:titleCondensed="Barcode" android:icon="@drawable/barcode"></item>
 </menu>

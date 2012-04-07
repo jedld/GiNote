@@ -1,65 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/shoutoutsView"
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<TextView android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:textSize="23dip"
-		android:text="Options" />
-	<CheckBox android:text="Include GPS information"
-		android:id="@+id/UseGPS" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
-	<CheckBox android:text="Go to add note on startup"
-		android:id="@+id/autoAddNote" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/shoutoutsView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-	<ProgressBar
-	    android:id="@+id/progressBar1"
-	    style="?android:attr/progressBarStyleHorizontal"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-	<TextView
-	    android:id="@+id/textView1"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:text="@string/auto_backup_options"
-	    android:textAppearance="?android:attr/textAppearanceLarge" />
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/back" />
 
-	<Button
-	    android:id="@+id/buttonFusionTableSync"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_gravity="center_horizontal"
-	    android:text="@string/fusion_table_sync" />
+        <ImageView
+            android:id="@+id/imageIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toRightOf="@id/home"
+            android:src="@drawable/copy" />
 
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageIcon"
+            android:text="GiNote Fusion"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	    <TextView
-	        android:id="@+id/textViewTableName"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="0"
-	        android:text="Table"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
 
-	    <EditText
-	        android:id="@+id/editTextTableName"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-	        android:editable="false"
-	        android:ems="10" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Options"
+        android:textSize="23dip" />
 
-	    <ImageButton
-	        android:id="@+id/buttonSync"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="0"
-	        android:src="@drawable/cloud" />
+    <CheckBox
+        android:id="@+id/UseGPS"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Include GPS information" />
 
-	</LinearLayout>
-		
+    <CheckBox
+        android:id="@+id/autoAddNote"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Go to add note on startup" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/auto_backup_options"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/buttonFusionTableSync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/fusion_table_sync" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textViewTableName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Table"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/editTextTableName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:editable="false"
+            android:ems="10" />
+
+        <ImageButton
+            android:id="@+id/buttonSync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:src="@drawable/cloud" />
+    </LinearLayout>
+
 </LinearLayout>

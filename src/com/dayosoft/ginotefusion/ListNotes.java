@@ -40,7 +40,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ListNotes extends Activity {
+public class ListNotes extends Activity implements OnClickListener {
 	TableLayout notesview;
 	DictionaryOpenHelper helper;
 	public static NoteListAdapter listAdapter;
@@ -121,6 +121,9 @@ public class ListNotes extends Activity {
 		listview.setAdapter(listAdapter);
 		listview.setOnItemClickListener(onItemClicked);
 
+		
+		ImageView cloudSync = (ImageView)findViewById(R.id.itemSync);
+		cloudSync.setOnClickListener(this);
 		if (settings.getBoolean("auto_add_note", false)) {
 			Intent intent = new Intent(ListNotes.this, AddNotes.class);
 
@@ -134,6 +137,32 @@ public class ListNotes extends Activity {
 		}
 	}
 
+	private boolean selectionHandlers(int resId) {
+		switch (resId) {
+		case R.id.itemSync:
+			View menuitem = (View) findViewById(R.id.itemSync);
+			if (getTableName() == null) {
+				Toast.makeText(
+						this,
+						"Fusion Tables needs to be setup, visit the options menu to do so.",
+						Toast.LENGTH_LONG).show();
+			} else {
+				if (DialogUtils.hasINet(this)) {
+					GoogleFTSyncer syncer = new GoogleFTSyncer(ListNotes.this,
+							menuitem);
+					syncer.execute();
+				} else {
+					Toast.makeText(
+							this,
+							"Unable to sync. Please ensure your device is connected to the internet",
+							Toast.LENGTH_LONG).show();
+				}
+			}
+			break;		
+		}
+		return false;
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -210,6 +239,11 @@ public class ListNotes extends Activity {
 
 	private boolean requestRefresh() {
 		return settings.getBoolean("request_sync", false);
+	}
+
+	@Override
+	public void onClick(View v) {
+		selectionHandlers(v.getId());
 	}
 
 }

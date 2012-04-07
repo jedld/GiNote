@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -35,6 +34,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,7 +48,8 @@ import com.dayosoft.utils.LocationFixedListener;
  * @author Joseph Emmanuel Dayo
  * 
  */
-public class AddNotes extends Activity implements LocationFixedListener {
+public class AddNotes extends Activity implements LocationFixedListener,
+		OnClickListener {
 	DictionaryOpenHelper helper;
 	EditText titleField, contentField;
 	TextView urlField;
@@ -180,6 +181,19 @@ public class AddNotes extends Activity implements LocationFixedListener {
 		Button saveButton = (Button) findViewById(R.id.CreateNewNote);
 		TextView timelabel = (TextView) findViewById(R.id.time);
 		urlField = (TextView) findViewById(R.id.url);
+
+		ImageView homeButton = (ImageView) findViewById(R.id.home);
+		homeButton.setOnClickListener(DialogUtils.closeNavigator(this));
+		
+		ImageView imageIcon = (ImageView) findViewById(R.id.imageIcon);
+		imageIcon.setOnClickListener(DialogUtils.closeNavigator(this));
+
+		ImageView camera = (ImageView) findViewById(R.id.itemCamera);
+		camera.setOnClickListener(this);
+
+		ImageView barcode = (ImageView) findViewById(R.id.itemBarcode);
+		barcode.setOnClickListener(this);
+
 		metaContent = (LinearLayout) findViewById(R.id.linearLayoutMeta);
 		saveButton.setOnClickListener(saveNoteListener);
 		// saveButton.getBackground().setColorFilter(0xFF00FF00, Mode.MULTIPLY);
@@ -223,8 +237,6 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			contentField.requestFocus();
 		}
 
-		ActionBar actionbar = getActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -237,37 +249,7 @@ public class AddNotes extends Activity implements LocationFixedListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
-		switch (item.getItemId()) {
-		case R.id.about:
-			DialogUtils
-					.showMessageAlert(
-							"GiNote 2.13\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
-							this);
-			return true;
-		case android.R.id.home:
-			finish();
-			break;
-		case R.id.itemOptions:
-			DialogUtils.switchActivity(Options.class, this);
-			break;
-		case R.id.itemLockGPS:
-			locator = new GoogleMapsLocation(AddNotes.this, AddNotes.this);
-			locator.startGetFix();
-			break;
-		case R.id.itemCamera:
-			showCamera();
-			break;
-		case R.id.itemGallery:
-			Intent i = new Intent(
-					Intent.ACTION_PICK,
-					android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-			startActivityForResult(i, ACTION_PICK_IMAGE);
-			break;
-		case R.id.itemBarcode:
-			IntentIntegrator integrator = new IntentIntegrator(this);
-			integrator.initiateScan();
-			return true;
-		default:
+		if (!selectionHandlers(item.getItemId())) {
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
@@ -437,5 +419,45 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			}
 		}
 
+	}
+
+	private boolean selectionHandlers(int resId) {
+		switch (resId) {
+		case R.id.about:
+			DialogUtils
+					.showMessageAlert(
+							"GiNote 2.13\nJoseph Dayo\nbugs? email jedld.android@gmail.com",
+							this);
+			return true;
+		case R.id.home:
+			finish();
+			return true;
+		case R.id.itemOptions:
+			DialogUtils.switchActivity(Options.class, this);
+			return true;
+		case R.id.itemLockGPS:
+			locator = new GoogleMapsLocation(AddNotes.this, AddNotes.this);
+			locator.startGetFix();
+			return true;
+		case R.id.itemCamera:
+			showCamera();
+			return true;
+		case R.id.itemGallery:
+			Intent i = new Intent(
+					Intent.ACTION_PICK,
+					android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+			startActivityForResult(i, ACTION_PICK_IMAGE);
+			return true;
+		case R.id.itemBarcode:
+			IntentIntegrator integrator = new IntentIntegrator(this);
+			integrator.initiateScan();
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public void onClick(View v) {
+		selectionHandlers(v.getId());
 	}
 }

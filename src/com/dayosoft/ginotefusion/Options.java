@@ -17,7 +17,6 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -31,6 +30,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 class ClientCredentials {
@@ -78,7 +78,12 @@ public class Options extends Activity implements OnClickListener,
 		if (getAuthToken() != null) {
 			syncFT.setEnabled(true);
 		}
-
+		ImageView homeButton = (ImageView) findViewById(R.id.home);
+		homeButton.setOnClickListener(DialogUtils.closeNavigator(this));
+		
+		ImageView imageIcon = (ImageView) findViewById(R.id.imageIcon);
+		imageIcon.setOnClickListener(DialogUtils.closeNavigator(this));
+		
 		DialogUtils.linkBoxToPrefs(useGPS, settings, "use_gps");
 		DialogUtils.linkBoxToPrefs(autoAddNote, settings, "auto_add_note");
 
@@ -89,8 +94,6 @@ public class Options extends Activity implements OnClickListener,
 		syncFT.setOnClickListener(this);
 		accountManager = new GoogleAccountManager(this);
 		
-		ActionBar actionbar = getActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -282,7 +285,7 @@ public class Options extends Activity implements OnClickListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
+		case R.id.home:
 			finish();
 			return true;
 		}

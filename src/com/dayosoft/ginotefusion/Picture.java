@@ -2,7 +2,6 @@ package com.dayosoft.ginotefusion;
 
 import java.util.List;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -10,10 +9,12 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.dayosoft.utils.DialogUtils;
 import com.dayosoft.utils.DictionaryOpenHelper;
 import com.dayosoft.utils.ImageDownloadTask;
 
@@ -37,10 +38,10 @@ public class Picture extends Activity {
 
 		helper = new DictionaryOpenHelper(this);
 		note = helper.load(note_id);
-
-		ActionBar actionbar = getActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
-
+		ImageView home = (ImageView) findViewById(R.id.home);
+		home.setOnClickListener(DialogUtils.closeNavigator(this));
+		View actionbar = (View)findViewById(R.id.actionbar);
+		
 		int height = dm.heightPixels - actionbar.getHeight() - 90;
 
 		List<NoteMeta> imagelist = note.getMeta(NoteMeta.IMAGE);
@@ -73,7 +74,7 @@ public class Picture extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
+		case R.id.home:
 			finish();
 			return true;
 		}

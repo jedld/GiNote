@@ -25,6 +25,8 @@ com.dayosoft.ginotefusion.AddNotes -> com.dayosoft.ginotefusion.AddNotes:
     boolean onContextItemSelected(android.view.MenuItem) -> onContextItemSelected
     void onStop() -> onStop
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
+    boolean selectionHandlers(int) -> a
+    void onClick(android.view.View) -> onClick
 com.dayosoft.ginotefusion.AddNotes$1 -> com.dayosoft.ginotefusion.a:
     com.dayosoft.ginotefusion.AddNotes this$0 -> a
     void onClick(android.view.View) -> onClick
@@ -65,6 +67,7 @@ com.dayosoft.ginotefusion.GoogleFTUpdater -> com.dayosoft.ginotefusion.h:
     java.text.SimpleDateFormat dateformat -> e
     java.util.TreeMap validTableSchema -> f
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+    void onPostExecute(java.lang.Object) -> onPostExecute
     void startSync() -> a
     void process_new_records(com.dayosoft.ginotefusion.Note[]) -> a
     java.lang.String sqlLize(java.lang.String) -> a
@@ -75,6 +78,34 @@ com.dayosoft.ginotefusion.GoogleFTUpdater -> com.dayosoft.ginotefusion.h:
     void createTable(java.lang.String,com.dayosoft.utils.FTQueryCompleteListener) -> b
     java.lang.String getTableId() -> b
     void setRequestRefresh(boolean) -> a
+com.dayosoft.ginotefusion.IntentIntegrator -> com.dayosoft.ginotefusion.i:
+    java.lang.String TAG -> a
+    java.util.Collection ALL_CODE_TYPES -> b
+    java.util.Collection TARGET_ALL_KNOWN -> c
+    android.app.Activity activity -> d
+    java.lang.String title -> e
+    java.lang.String message -> f
+    java.lang.String buttonYes -> g
+    java.lang.String buttonNo -> h
+    java.util.Collection targetApplications -> i
+    android.app.AlertDialog initiateScan() -> a
+    java.lang.String findTargetAppPackage(android.content.Intent) -> a
+    com.dayosoft.ginotefusion.IntentResult parseActivityResult(int,int,android.content.Intent) -> a
+    android.app.Activity access$0(com.dayosoft.ginotefusion.IntentIntegrator) -> a
+    java.lang.String access$1() -> b
+com.dayosoft.ginotefusion.IntentIntegrator$1 -> com.dayosoft.ginotefusion.j:
+    com.dayosoft.ginotefusion.IntentIntegrator this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.dayosoft.ginotefusion.IntentIntegrator$2 -> com.dayosoft.ginotefusion.k:
+    void onClick(android.content.DialogInterface,int) -> onClick
+com.dayosoft.ginotefusion.IntentResult -> com.dayosoft.ginotefusion.l:
+    java.lang.String contents -> a
+    java.lang.String formatName -> b
+    byte[] rawBytes -> c
+    java.lang.Integer orientation -> d
+    java.lang.String errorCorrectionLevel -> e
+    java.lang.String getContents() -> a
+    java.lang.String toString() -> toString
 com.dayosoft.ginotefusion.ListNotes -> com.dayosoft.ginotefusion.ListNotes:
     com.dayosoft.utils.DictionaryOpenHelper helper -> a
     com.dayosoft.ginotefusion.NoteListAdapter listAdapter -> b
@@ -87,16 +118,17 @@ com.dayosoft.ginotefusion.ListNotes -> com.dayosoft.ginotefusion.ListNotes:
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
     java.lang.String getTableName() -> a
-com.dayosoft.ginotefusion.ListNotes$1 -> com.dayosoft.ginotefusion.i:
+    void onClick(android.view.View) -> onClick
+com.dayosoft.ginotefusion.ListNotes$1 -> com.dayosoft.ginotefusion.m:
     com.dayosoft.ginotefusion.ListNotes this$0 -> a
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
-com.dayosoft.ginotefusion.ListNotes$2 -> com.dayosoft.ginotefusion.j:
+com.dayosoft.ginotefusion.ListNotes$2 -> com.dayosoft.ginotefusion.n:
     com.dayosoft.ginotefusion.ListNotes this$0 -> a
     void onClick(android.view.View) -> onClick
-com.dayosoft.ginotefusion.ListNotes$3 -> com.dayosoft.ginotefusion.k:
+com.dayosoft.ginotefusion.ListNotes$3 -> com.dayosoft.ginotefusion.o:
     com.dayosoft.ginotefusion.ListNotes this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-com.dayosoft.ginotefusion.Note -> com.dayosoft.ginotefusion.l:
+com.dayosoft.ginotefusion.Note -> com.dayosoft.ginotefusion.p:
     int id -> a
     int ft_dirty -> c
     java.lang.String title -> d
@@ -135,7 +167,7 @@ com.dayosoft.ginotefusion.Note -> com.dayosoft.ginotefusion.l:
     java.util.List getMeta(int) -> d
     void setFt_dirty(int) -> e
     int getFt_dirty() -> l
-com.dayosoft.ginotefusion.NoteListAdapter -> com.dayosoft.ginotefusion.m:
+com.dayosoft.ginotefusion.NoteListAdapter -> com.dayosoft.ginotefusion.q:
     com.dayosoft.utils.DictionaryOpenHelper helper -> b
     java.lang.String query -> c
     java.util.Vector idlist -> d
@@ -156,10 +188,10 @@ com.dayosoft.ginotefusion.NoteListAdapter -> com.dayosoft.ginotefusion.m:
     boolean isEnabled(int) -> isEnabled
     void notifyChange() -> a
     void notifyInvalidate() -> b
-com.dayosoft.ginotefusion.NoteListAdapter$1 -> com.dayosoft.ginotefusion.n:
+com.dayosoft.ginotefusion.NoteListAdapter$1 -> com.dayosoft.ginotefusion.r:
     com.dayosoft.ginotefusion.NoteListAdapter this$0 -> a
     void onClick(android.view.View) -> onClick
-com.dayosoft.ginotefusion.NoteMeta -> com.dayosoft.ginotefusion.o:
+com.dayosoft.ginotefusion.NoteMeta -> com.dayosoft.ginotefusion.s:
     int type -> a
     int id -> b
     java.lang.String resource_url -> c
@@ -169,7 +201,7 @@ com.dayosoft.ginotefusion.NoteMeta -> com.dayosoft.ginotefusion.o:
     void setId(int) -> b
     java.lang.String getResource_url() -> c
     void setResource_url(java.lang.String) -> a
-com.dayosoft.ginotefusion.NoteSyncer -> com.dayosoft.ginotefusion.p:
+com.dayosoft.ginotefusion.NoteSyncer -> com.dayosoft.ginotefusion.t:
     void process_new_records(com.dayosoft.ginotefusion.Note[]) -> a
     void process_updated_records(com.dayosoft.ginotefusion.Note[]) -> b
 com.dayosoft.ginotefusion.Options -> com.dayosoft.ginotefusion.Options:
@@ -187,29 +219,30 @@ com.dayosoft.ginotefusion.Options -> com.dayosoft.ginotefusion.Options:
     void setAuthToken(java.lang.String) -> b
     java.lang.String getAuthToken() -> b
     void onQueryComplete(java.util.ArrayList) -> a
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     java.lang.String getTableName() -> c
     void access$0(com.dayosoft.ginotefusion.Options,java.lang.String) -> a
     void access$1(com.dayosoft.ginotefusion.Options,java.lang.String) -> b
     void access$2(com.dayosoft.ginotefusion.Options) -> a
-com.dayosoft.ginotefusion.Options$1 -> com.dayosoft.ginotefusion.q:
+com.dayosoft.ginotefusion.Options$1 -> com.dayosoft.ginotefusion.u:
     com.dayosoft.ginotefusion.Options this$0 -> a
     void run(android.accounts.AccountManagerFuture) -> run
-com.dayosoft.ginotefusion.Options$2 -> com.dayosoft.ginotefusion.r:
+com.dayosoft.ginotefusion.Options$2 -> com.dayosoft.ginotefusion.v:
     com.dayosoft.ginotefusion.Options this$0 -> a
     android.widget.EditText val$input -> b
     void onClick(android.content.DialogInterface,int) -> onClick
     com.dayosoft.ginotefusion.Options access$0(com.dayosoft.ginotefusion.Options$2) -> a
-com.dayosoft.ginotefusion.Options$2$1 -> com.dayosoft.ginotefusion.s:
+com.dayosoft.ginotefusion.Options$2$1 -> com.dayosoft.ginotefusion.w:
     com.dayosoft.ginotefusion.Options$2 this$1 -> a
     java.lang.String val$value -> b
     void onQueryComplete(java.util.ArrayList) -> a
-com.dayosoft.ginotefusion.Options$3 -> com.dayosoft.ginotefusion.t:
+com.dayosoft.ginotefusion.Options$3 -> com.dayosoft.ginotefusion.x:
     void onClick(android.content.DialogInterface,int) -> onClick
-com.dayosoft.ginotefusion.Options$4 -> com.dayosoft.ginotefusion.u:
+com.dayosoft.ginotefusion.Options$4 -> com.dayosoft.ginotefusion.y:
     com.dayosoft.ginotefusion.Options this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
     com.dayosoft.ginotefusion.Options access$0(com.dayosoft.ginotefusion.Options$4) -> a
-com.dayosoft.ginotefusion.Options$4$1 -> com.dayosoft.ginotefusion.v:
+com.dayosoft.ginotefusion.Options$4$1 -> com.dayosoft.ginotefusion.z:
     com.dayosoft.ginotefusion.Options$4 this$1 -> a
     com.dayosoft.ginotefusion.GoogleFTUpdater val$updater -> b
     int val$item_index -> c
@@ -218,6 +251,7 @@ com.dayosoft.ginotefusion.Picture -> com.dayosoft.ginotefusion.Picture:
     com.dayosoft.ginotefusion.Note note -> a
     com.dayosoft.utils.DictionaryOpenHelper helper -> b
     void onCreate(android.os.Bundle) -> onCreate
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
 com.dayosoft.ginotefusion.ViewNotes -> com.dayosoft.ginotefusion.ViewNotes:
 com.dayosoft.utils.ActivityNavigator -> com.dayosoft.a.a:
     java.lang.Class activityClass -> a
