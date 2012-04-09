@@ -4,4 +4,5 @@
     <string name="app_name">GiNote Fusion</string>
     <string name="auto_backup_options">Automatic Backup Options</string>
     <string name="fusion_table_sync">Setup Google Fusion Table Sync</string>
+    <string name="search_hint">Search GiNote documents</string>
 </resources>

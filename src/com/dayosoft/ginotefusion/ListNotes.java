@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,9 +98,10 @@ public class ListNotes extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mainmenu, menu);
 
-		if (getTableName() != null) {
-			MenuItem menuitem = menu.findItem(R.id.itemSync);
-		}
+	    // Get the SearchView and set the searchable configuration
+	    SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+		SearchView searchView = (SearchView) menu.findItem(R.id.itemSearch).getActionView();
+	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 		return true;
 	}
 

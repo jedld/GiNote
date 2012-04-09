@@ -20,6 +20,7 @@ import android.accounts.OperationCanceledException;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -88,7 +89,7 @@ public class Options extends Activity implements OnClickListener,
 		setupGoogleAccount.setOnClickListener(this);
 		syncFT.setOnClickListener(this);
 		accountManager = new GoogleAccountManager(this);
-		
+
 		ActionBar actionbar = getActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 	}
@@ -184,10 +185,20 @@ public class Options extends Activity implements OnClickListener,
 				final String value = input.getText().toString();
 				final GoogleFTUpdater updater = new GoogleFTUpdater(
 						Options.this);
+				final ProgressDialog progress_dialog = ProgressDialog.show(
+						Options.this, "",
+						"Just a moment while your table is being created...",
+						true);
+
 				updater.createTable(value, new FTQueryCompleteListener() {
 					@Override
 					public void onQueryComplete(
 							ArrayList<HashMap<String, String>> result) {
+
+						if (progress_dialog != null) {
+							progress_dialog.dismiss();
+						}
+
 						Toast.makeText(Options.this, "Table Created.",
 								Toast.LENGTH_SHORT).show();
 						final String table_id = result.get(0).get("TABLEID");
@@ -239,11 +250,21 @@ public class Options extends Activity implements OnClickListener,
 				} else {
 					final GoogleFTUpdater updater = new GoogleFTUpdater(
 							Options.this);
+
+					final ProgressDialog progress_dialog = ProgressDialog
+							.show(Options.this,
+									"",
+									"checking table...",
+									true);
+
 					updater.describeTable(table_ids[item_index],
 							new FTQueryCompleteListener() {
 								@Override
 								public void onQueryComplete(
 										ArrayList<HashMap<String, String>> result) {
+									if (progress_dialog != null) {
+										progress_dialog.dismiss();
+									}
 									// Check for table structure compatibility
 									HashMap<String, String> targetTableSchema = new HashMap<String, String>();
 									for (HashMap<String, String> types : result) {
@@ -278,7 +299,7 @@ public class Options extends Activity implements OnClickListener,
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

@@ -382,9 +382,11 @@ public class AddNotes extends Activity implements LocationFixedListener {
 			IntentResult scanResult = IntentIntegrator.parseActivityResult(
 					requestCode, resultCode, data);
 			if (scanResult != null) {
-				contentField.setText(contentField.getText().toString()
-						+ scanResult.getContents());
-				titleField.requestFocus();
+				if (contentField.getText() != null) {
+					contentField.setText(contentField.getText().toString()
+							+ scanResult.getContents());
+					titleField.requestFocus();
+				}
 			}
 		} else if (requestCode == ACTION_PICK_IMAGE) {
 			if (resultCode == RESULT_OK) {
