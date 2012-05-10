@@ -12,18 +12,24 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.protocol.HTTP;
 
 import com.google.api.client.http.HttpRequest;
 
@@ -99,18 +105,27 @@ public class FusionTableService extends
 		HttpURLConnection conn = null;
 		URL google_ft_url = null;
 		try {
-			String params = URLUtils.urlParamsToString(other_params);
-			String url_str = "https://www.google.com/fusiontables/api/query"
-					+ "?" + params;
-			Log.d(this.getClass().toString(), ">>" + url_str);
-			google_ft_url = new URL(url_str);
-			conn = (HttpURLConnection) google_ft_url.openConnection();
+
 			HttpClient httpclient = new DefaultHttpClient();
 
 			HttpRequestBase request = null;
 			if (service.equalsIgnoreCase("create")) {
-				request = new HttpPost(url_str);
+				String url_str = "https://www.google.com/fusiontables/api/query";
+				Log.d(this.getClass().toString(), "POST >>" + url_str);
+				HttpPost postRequest = new HttpPost(url_str);
+				
+			    List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+				BasicHttpParams basicParams = new BasicHttpParams();
+				for (String key : other_params.keySet()) {
+			        nvps.add(new BasicNameValuePair(key, other_params.get(key)));
+				}
+
+				postRequest.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+				request = postRequest;
 			} else {
+				String url_str = "https://www.google.com/fusiontables/api/query"
+						+ "?" + URLUtils.urlParamsToString(other_params);
+				Log.d(this.getClass().toString(), "GET >>" + url_str);
 				request = new HttpGet(url_str);
 			}
 
